@@ -25,6 +25,8 @@ export default function TabLayout() {
           elevation: 0,
           paddingBottom: insets.bottom + (Platform.OS === "android" ? 10 : 0),
           paddingTop: 10,
+          borderTopRightRadius: 16,
+          borderTopLeftRadius: 16,
         },
       }}
     >

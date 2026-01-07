@@ -1,14 +1,12 @@
+import ThemeText from "@/src/components/ui/ThemeText";
+import { Ingredient } from "@/src/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
-
-interface Ingredient {
-  id: string;
-  name: string;
-  quantity: string;
-}
+import { Alert, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function Home() {
+  const router = useRouter();
   const [ingredient, setIngredient] = useState("");
   const [ingredientList, setIngredientsList] = useState<Ingredient[]>([]);
 
@@ -53,26 +51,41 @@ export default function Home() {
   return (
     <View className="mx-4 mt-10 flex-1">
       <View className="flex flex-row items-center justify-between">
-        <Text className="font-os-bold text-primary">
-          Halo, <Text className="text-heading">Sandi</Text>!
-        </Text>
+        <ThemeText type="title">
+          Halo,{" "}
+          <ThemeText type="title" className="text-primary">
+            Sandi
+          </ThemeText>
+          !
+        </ThemeText>
         <TouchableOpacity>
           <Ionicons name="person-circle-outline" size={50} color="black" />
         </TouchableOpacity>
       </View>
 
       <View className="mt-12">
-        <Text className="text-center font-os-bold">
+        <ThemeText type="title" className="text-center">
           Lagi laper? Ada bahan apa nih?
-        </Text>
+        </ThemeText>
 
         <View
-          className={`
-          h-15 mx-12 mt-7 flex-row items-center justify-between rounded-3xl bg-white px-2
-        `}
+          className="mx-12 mt-7 h-14 flex-row items-center justify-between rounded-3xl bg-white px-2"
+          style={{
+            // --- KHUSUS IOS ---
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 7,
+            },
+            shadowOpacity: 0.05,
+            shadowRadius: 7,
+
+            // --- KHUSUS ANDROID ---
+            elevation: 2,
+          }}
         >
           <TextInput
-            className="h-full flex-1 font-os-regular text-[12px] text-base text-gray-800"
+            className="ml-1 h-full flex-1 rounded-3xl bg-white font-os-regular text-base text-gray-800"
             placeholderTextColor="#9CA3AF"
             placeholder="telur, sawi, tempe..."
             value={ingredient}
@@ -81,7 +94,7 @@ export default function Home() {
           />
           <TouchableOpacity>
             <Ionicons
-              name="add-sharp"
+              name="add-circle"
               size={32}
               color="#2A9D8F"
               onPress={handleAddIngredient}
@@ -89,14 +102,31 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-        <View className="min-h-1/2 mx-12 mt-7 rounded-3xl bg-white p-4">
-          <Text className="font-os-bold text-[12px]">Bahan-bahanmu:</Text>
+        <View
+          className="min-h-1/2 mx-12 mt-7 rounded-3xl bg-white p-4"
+          style={{
+            // --- KHUSUS IOS ---
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 7,
+            },
+            shadowOpacity: 0.05,
+            shadowRadius: 7,
+
+            // --- KHUSUS ANDROID ---
+            elevation: 2,
+          }}
+        >
+          <ThemeText size="sm" type="title">
+            Bahan-bahanmu:
+          </ThemeText>
           {ingredientList.length == 0 ? (
             <View className="mt-8 items-center justify-center opacity-30">
               <Ionicons name="basket-outline" size={40} color="black" />
-              <Text className="text-center font-os-regular text-sm">
+              <ThemeText size="sm" type="caption" className="text-center">
                 Keranjang masih kosong nih
-              </Text>
+              </ThemeText>
             </View>
           ) : (
             ingredientList.map((item) => (
@@ -104,13 +134,17 @@ export default function Home() {
                 key={item.id}
                 className="mt-3 flex flex-row items-center gap-1"
               >
-                <Text className="flex-1 font-os-regular text-[12px]">
+                <ThemeText size="sm" className="flex-1 font-os-regular">
                   {item.name}
-                </Text>
+                </ThemeText>
                 <TextInput
-                  className="w-[30%] border-b-2 border-b-[#9CA3AF] py-0 font-os-regular text-[12px] text-base text-gray-800"
+                  className="w-[30%] border-b-[1px] border-b-[#9CA3AF] py-0 font-os-regular text-[12px] text-gray-800"
                   placeholderTextColor="#9CA3AF"
                   placeholder="2 potong"
+                  value={item.quantity}
+                  onChangeText={(text) =>
+                    handleUpdateIngredientQuantity(text, item.id)
+                  }
                 />
                 <TouchableOpacity>
                   <Ionicons
@@ -126,10 +160,17 @@ export default function Home() {
         </View>
 
         {ingredientList.length > 0 && (
-          <TouchableOpacity className="mt-7 rounded-2xl bg-primary py-3">
-            <Text className="text-center font-os-bold text-white">
+          <TouchableOpacity
+            className="mt-7 rounded-2xl bg-primary py-3"
+            onPress={() => router.push("/recipe-result")}
+          >
+            <ThemeText
+              size="base"
+              type="title"
+              className="text-center text-white"
+            >
               Cari Resep
-            </Text>
+            </ThemeText>
           </TouchableOpacity>
         )}
       </View>
