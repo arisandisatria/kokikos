@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/color";
 import ThemeText from "@/src/components/ui/ThemeText";
 import { Ingredient } from "@/src/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -51,9 +52,9 @@ export default function Home() {
   return (
     <View className="mx-4 mt-10 flex-1">
       <View className="flex flex-row items-center justify-between">
-        <ThemeText type="title">
+        <ThemeText type="title" size="lg">
           Halo,{" "}
-          <ThemeText type="title" className="text-primary">
+          <ThemeText type="title" size="lg" className="text-primary">
             Sandi
           </ThemeText>
           !
@@ -69,7 +70,7 @@ export default function Home() {
         </ThemeText>
 
         <View
-          className="mx-12 mt-7 h-14 flex-row items-center justify-between rounded-3xl bg-white px-2"
+          className="mx-10 mt-7 h-14 flex-row items-center justify-between rounded-2xl bg-white px-2"
           style={{
             // --- KHUSUS IOS ---
             shadowColor: "#000",
@@ -85,8 +86,9 @@ export default function Home() {
           }}
         >
           <TextInput
-            className="ml-1 h-full flex-1 rounded-3xl bg-white font-os-regular text-base text-gray-800"
-            placeholderTextColor="#9CA3AF"
+            className="ml-1 flex-1 bg-white font-os-regular text-base text-gray-800"
+            placeholderClassName="text-base"
+            placeholderTextColor={Colors.muted}
             placeholder="telur, sawi, tempe..."
             value={ingredient}
             onChangeText={setIngredient}
@@ -103,7 +105,7 @@ export default function Home() {
         </View>
 
         <View
-          className="min-h-1/2 mx-12 mt-7 rounded-3xl bg-white p-4"
+          className="min-h-1/2 mx-10 mt-4 rounded-2xl bg-white p-4"
           style={{
             // --- KHUSUS IOS ---
             shadowColor: "#000",
@@ -122,8 +124,8 @@ export default function Home() {
             Bahan-bahanmu:
           </ThemeText>
           {ingredientList.length == 0 ? (
-            <View className="mt-8 items-center justify-center opacity-30">
-              <Ionicons name="basket-outline" size={40} color="black" />
+            <View className="mt-8 items-center justify-center">
+              <Ionicons name="basket-outline" size={40} color={Colors.muted} />
               <ThemeText size="sm" type="caption" className="text-center">
                 Keranjang masih kosong nih
               </ThemeText>
@@ -134,12 +136,15 @@ export default function Home() {
                 key={item.id}
                 className="mt-3 flex flex-row items-center gap-1"
               >
-                <ThemeText size="sm" className="flex-1 font-os-regular">
+                <ThemeText
+                  size="sm"
+                  className="flex-1 font-os-regular text-body"
+                >
                   {item.name}
                 </ThemeText>
                 <TextInput
-                  className="w-[30%] border-b-[1px] border-b-[#9CA3AF] py-0 font-os-regular text-[12px] text-gray-800"
-                  placeholderTextColor="#9CA3AF"
+                  className="w-[30%] border-b-[1px] border-b-[#9CA3AF] py-0 font-os-regular text-sm text-gray-800"
+                  placeholderTextColor={Colors.muted}
                   placeholder="2 potong"
                   value={item.quantity}
                   onChangeText={(text) =>
@@ -149,8 +154,8 @@ export default function Home() {
                 <TouchableOpacity>
                   <Ionicons
                     name="close-sharp"
-                    size={32}
-                    color="#FF383C"
+                    size={28}
+                    color={Colors.danger}
                     onPress={() => handleRemoveIngredient(item.id)}
                   />
                 </TouchableOpacity>
@@ -161,7 +166,7 @@ export default function Home() {
 
         {ingredientList.length > 0 && (
           <TouchableOpacity
-            className="mt-7 rounded-2xl bg-primary py-3"
+            className="mx-10 mt-8 rounded-2xl bg-primary py-3"
             onPress={() => router.push("/recipe-result")}
           >
             <ThemeText

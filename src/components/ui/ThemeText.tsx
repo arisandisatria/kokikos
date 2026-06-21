@@ -1,11 +1,26 @@
 import { ThemedTextProps } from "@/src/types";
 import clsx, { ClassValue } from "clsx";
-import React from "react";
 import { Text } from "react-native";
-import { twMerge } from "tailwind-merge";
+import { extendTailwindMerge } from "tailwind-merge";
+
+const customTwMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      "font-size": ["text-xsm", "text-sm", "text-base", "text-lg"],
+      "text-color": [
+        "text-primary",
+        "text-secondary",
+        "text-background",
+        "text-heading",
+        "text-body",
+        "text-muted",
+      ],
+    },
+  },
+});
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return customTwMerge(clsx(inputs));
 }
 
 export default function ThemeText({
@@ -14,19 +29,21 @@ export default function ThemeText({
   type = "default",
   ...props
 }: ThemedTextProps) {
-  let baseClass = "";
+  const typeClasses = {
+    caption: "font-os-regular text-muted",
+    default: "font-os-regular text-body",
+    subtitle: "font-os-semibold text-heading",
+    title: "font-os-bold text-heading",
+  };
 
-  if (type == "caption") baseClass += " font-os-regular text-muted";
-  if (type == "default") baseClass += " font-os-regular text-body";
-  if (type == "subtitle") baseClass += " font-os-semibold text-heading";
-  if (type == "title") baseClass += " font-os-bold text-heading";
+  const sizeClasses = {
+    xsm: "text-xsm",
+    sm: "text-sm",
+    base: "text-base",
+    lg: "text-lg",
+  };
 
-  if (size == "xsm") baseClass += " text-[10px]";
-  if (size == "sm") baseClass += " text-[12px]";
-  if (size == "base") baseClass += " text-[14px]";
-  if (size == "lg") baseClass += " text-[16px]";
+  const finalClass = cn(typeClasses[type], sizeClasses[size], className);
 
-  const finalClass = cn(baseClass, className);
-
-  return <Text className={`${finalClass} ${className}`} {...props} />;
+  return <Text className={finalClass} {...props} />;
 }

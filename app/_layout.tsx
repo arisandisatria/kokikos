@@ -7,30 +7,25 @@ import {
   useFonts,
 } from "@expo-google-fonts/open-sans";
 import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-
-SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  let [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     OpenSans_400Regular,
     OpenSans_600SemiBold,
     OpenSans_700Bold,
   });
 
-  useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
+  useFonts({
+    regular: OpenSans_400Regular,
+    "outfit-semibold": OpenSans_600SemiBold,
+    "outfit-bold": OpenSans_700Bold,
+  });
 
-  if (!fontsLoaded) return null;
   return (
     <Stack
       screenOptions={{
         headerShown: false,
       }}
-    />
+    ></Stack>
   );
 }

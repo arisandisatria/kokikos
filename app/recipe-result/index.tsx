@@ -2,7 +2,7 @@ import RecipeResultCard from "@/src/components/features/RecipeResultCard";
 import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 export default function index() {
@@ -53,15 +53,17 @@ export default function index() {
         })}
       </View>
 
-      <View>
-        <RecipeResultCard
-          productName="Nasi Telur Pontianak"
-          estimatedPrice="10.000"
-          estimatedTime="10"
-          insufficientIngridients="Daun bawang, gula, garam"
-          matchPercentage={90}
-        />
-      </View>
+      <TouchableOpacity onPress={() => router.push("/recipe-detail")}>
+        <View>
+          <RecipeResultCard
+            productName="Nasi Peler Bakar"
+            estimatedPrice="10.000"
+            estimatedTime="10"
+            insufficientIngridients="Daun bawang, gula, garam"
+            matchPercentage={90}
+          />
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }
