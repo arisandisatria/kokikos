@@ -54,7 +54,7 @@ export default function index() {
       </View>
 
       <TouchableOpacity onPress={() => router.push("/recipe-detail")}>
-        <View>
+        <View pointerEvents="none">
           <RecipeResultCard
             productName="Nasi Peler Bakar"
             estimatedPrice="10.000"
