@@ -1,8 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
-import React from "react";
-import { Platform, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from "../../constants/theme";
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -19,7 +19,7 @@ export default function TabLayout() {
           width: "100%",
         },
         tabBarStyle: {
-          backgroundColor: "#FFFFFF",
+          backgroundColor: Colors.primary || "#1e293b",
           borderTopWidth: 0,
           height: 60 + insets.bottom,
           elevation: 0,
@@ -27,6 +27,7 @@ export default function TabLayout() {
           paddingTop: 10,
           borderTopRightRadius: 16,
           borderTopLeftRadius: 16,
+          position: "absolute",
         },
       }}
     >
@@ -34,7 +35,7 @@ export default function TabLayout() {
         name="home"
         options={{
           tabBarIcon: ({ color, focused }) => (
-            <View className="items-center justify-center">
+            <View style={styles.iconContainer}>
               <Ionicons
                 name={focused ? "home" : "home-outline"}
                 size={28}
@@ -75,3 +76,10 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

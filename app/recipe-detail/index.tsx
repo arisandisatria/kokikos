@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/color";
+import { Colors } from "@/constants/theme";
 import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -82,7 +82,7 @@ function index() {
               >
                 <ThemeText
                   type="subtitle"
-                  className="text-center font-os-semibold"
+                  className="font-os-semibold text-center"
                 >
                   {tab.label}
                 </ThemeText>

@@ -1,5 +1,3 @@
-import "../global.css";
-
 import {
   OpenSans_400Regular,
   OpenSans_600SemiBold,

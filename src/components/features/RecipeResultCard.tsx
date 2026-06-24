@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/color";
+import { Colors } from "@/constants/theme";
 import { RecipeResultCardProps } from "@/src/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image, TouchableOpacity, View } from "react-native";
@@ -43,7 +43,7 @@ function RecipeResultCard({
               {estimatedTime} menit
             </ThemeText>
           </View>
-          <View className="my-15 h-5 w-0.5 bg-muted" />
+          <View className="my-15 bg-muted h-5 w-0.5" />
           <View className="flex-row gap-1">
             <Ionicons name="cash-outline" size={17} color={Colors.secondary} />
             <ThemeText size="xsm" type="caption">

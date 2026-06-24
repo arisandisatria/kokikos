@@ -1,11 +1,12 @@
+import { Colors } from "@/constants/theme";
 import RecipeResultCard from "@/src/components/features/RecipeResultCard";
 import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-export default function index() {
+export default function RecipeResult() {
   const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState("cocok");
 
@@ -16,11 +17,11 @@ export default function index() {
   ];
 
   return (
-    <View className="mx-4 mt-10 flex-1">
-      <View className="relative mt-4 flex flex-row items-center justify-center">
+    <View style={styles.container}>
+      <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.push("/home")}
-          className="absolute left-0 z-10"
+          style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={32} color="black" />
         </TouchableOpacity>
@@ -28,7 +29,7 @@ export default function index() {
         <ThemeText type="title">Hasil Pencarian</ThemeText>
       </View>
 
-      <View className="mt-5 flex flex-row gap-1">
+      <View style={styles.filterContainer}>
         {filters.map((filter) => {
           const isActive = selectedFilter === filter.id;
 
@@ -36,15 +37,18 @@ export default function index() {
             <TouchableOpacity
               key={filter.id}
               onPress={() => setSelectedFilter(filter.id)}
-              className={`
-                w-[30%] items-center justify-center rounded-3xl py-2
-                ${isActive ? "border border-primary bg-primary" : "border border-gray-300 bg-white"}
-              `}
+              style={[
+                styles.filterTab,
+                isActive ? styles.tabActive : styles.tabInactive,
+              ]}
             >
               <ThemeText
                 size="sm"
                 type="subtitle"
-                className={`text-center font-os-semibold ${isActive ? "text-white" : "text-gray-500"}`}
+                style={[
+                  styles.tabText,
+                  isActive ? styles.textActive : styles.textInactive,
+                ]}
               >
                 {filter.label}
               </ThemeText>
@@ -67,3 +71,54 @@ export default function index() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginHorizontal: 16,
+    marginTop: 40,
+  },
+  header: {
+    position: "relative",
+    marginTop: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  backButton: {
+    position: "absolute",
+    left: 0,
+    zIndex: 10,
+  },
+  filterContainer: {
+    marginTop: 20,
+    flexDirection: "row",
+    gap: 4,
+  },
+  filterTab: {
+    width: "30%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 24,
+    paddingVertical: 8,
+    borderWidth: 1,
+  },
+  tabActive: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary,
+  },
+  tabInactive: {
+    borderColor: "#d1d5db",
+    backgroundColor: "#FFFFFF",
+  },
+  tabText: {
+    textAlign: "center",
+    fontFamily: "os-semibold",
+  },
+  textActive: {
+    color: "#FFFFFF",
+  },
+  textInactive: {
+    color: "#6b7280",
+  },
+});

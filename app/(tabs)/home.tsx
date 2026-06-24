@@ -1,10 +1,17 @@
-import { Colors } from "@/constants/color";
+import { Colors } from "@/constants/theme";
 import ThemeText from "@/src/components/ui/ThemeText";
 import { Ingredient } from "@/src/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Home() {
   const router = useRouter();
@@ -24,7 +31,6 @@ export default function Home() {
     };
 
     setIngredientsList([...ingredientList, newIngredient]);
-
     setIngredient("");
   }
 
@@ -50,11 +56,11 @@ export default function Home() {
   }
 
   return (
-    <View className="mx-4 mt-10 flex-1">
-      <View className="flex flex-row items-center justify-between">
+    <View style={styles.container}>
+      <View style={styles.header}>
         <ThemeText type="title" size="lg">
           Halo,{" "}
-          <ThemeText type="title" size="lg" className="text-primary">
+          <ThemeText type="title" size="lg" style={styles.textPrimary}>
             Sandi
           </ThemeText>
           !
@@ -64,86 +70,45 @@ export default function Home() {
         </TouchableOpacity>
       </View>
 
-      <View className="mt-12">
-        <ThemeText type="title" className="text-center">
+      <View style={styles.mainContent}>
+        <ThemeText type="title" style={styles.textCenter}>
           Lagi laper? Ada bahan apa nih?
         </ThemeText>
 
-        <View
-          className="mx-10 mt-7 h-14 flex-row items-center justify-between rounded-2xl bg-white px-2"
-          style={{
-            // --- KHUSUS IOS ---
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 7,
-            },
-            shadowOpacity: 0.05,
-            shadowRadius: 7,
-
-            // --- KHUSUS ANDROID ---
-            elevation: 2,
-          }}
-        >
+        <View style={[styles.card, styles.inputBar]}>
           <TextInput
-            className="ml-1 flex-1 bg-white font-os-regular text-base text-gray-800"
-            placeholderClassName="text-base"
+            style={styles.textInput}
             placeholderTextColor={Colors.muted}
             placeholder="telur, sawi, tempe..."
             value={ingredient}
             onChangeText={setIngredient}
             onSubmitEditing={handleAddIngredient}
           />
-          <TouchableOpacity>
-            <Ionicons
-              name="add-circle"
-              size={32}
-              color="#2A9D8F"
-              onPress={handleAddIngredient}
-            />
+          <TouchableOpacity onPress={handleAddIngredient}>
+            <Ionicons name="add-circle" size={32} color="#2A9D8F" />
           </TouchableOpacity>
         </View>
 
-        <View
-          className="min-h-1/2 mx-10 mt-4 rounded-2xl bg-white p-4"
-          style={{
-            // --- KHUSUS IOS ---
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 7,
-            },
-            shadowOpacity: 0.05,
-            shadowRadius: 7,
-
-            // --- KHUSUS ANDROID ---
-            elevation: 2,
-          }}
-        >
+        <View style={[styles.card, styles.listContainer]}>
           <ThemeText size="sm" type="title">
             Bahan-bahanmu:
           </ThemeText>
-          {ingredientList.length == 0 ? (
-            <View className="mt-8 items-center justify-center">
+
+          {ingredientList.length === 0 ? (
+            <View style={styles.emptyContainer}>
               <Ionicons name="basket-outline" size={40} color={Colors.muted} />
-              <ThemeText size="sm" type="caption" className="text-center">
+              <ThemeText size="sm" type="caption" style={styles.textCenter}>
                 Keranjang masih kosong nih
               </ThemeText>
             </View>
           ) : (
             ingredientList.map((item) => (
-              <View
-                key={item.id}
-                className="mt-3 flex flex-row items-center gap-1"
-              >
-                <ThemeText
-                  size="sm"
-                  className="flex-1 font-os-regular text-body"
-                >
+              <View key={item.id} style={styles.ingredientRow}>
+                <ThemeText size="sm" style={styles.ingredientName}>
                   {item.name}
                 </ThemeText>
                 <TextInput
-                  className="w-[30%] border-b-[1px] border-b-[#9CA3AF] py-0 font-os-regular text-sm text-gray-800"
+                  style={styles.quantityInput}
                   placeholderTextColor={Colors.muted}
                   placeholder="2 potong"
                   value={item.quantity}
@@ -151,12 +116,13 @@ export default function Home() {
                     handleUpdateIngredientQuantity(text, item.id)
                   }
                 />
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleRemoveIngredient(item.id)}
+                >
                   <Ionicons
                     name="close-sharp"
                     size={28}
-                    color={Colors.danger}
-                    onPress={() => handleRemoveIngredient(item.id)}
+                    color={Colors.danger || "#ef4444"}
                   />
                 </TouchableOpacity>
               </View>
@@ -166,14 +132,10 @@ export default function Home() {
 
         {ingredientList.length > 0 && (
           <TouchableOpacity
-            className="mx-10 mt-8 rounded-2xl bg-primary py-3"
+            style={styles.buttonSubmit}
             onPress={() => router.push("/recipe-result")}
           >
-            <ThemeText
-              size="base"
-              type="title"
-              className="text-center text-white"
-            >
+            <ThemeText size="base" type="title" style={styles.buttonText}>
               Cari Resep
             </ThemeText>
           </TouchableOpacity>
@@ -182,3 +144,98 @@ export default function Home() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginHorizontal: 16,
+    marginTop: 40,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  textPrimary: {
+    color: Colors.primary,
+  },
+  mainContent: {
+    marginTop: 48,
+  },
+  textCenter: {
+    textAlign: "center",
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 7 },
+        shadowOpacity: 0.05,
+        shadowRadius: 7,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  inputBar: {
+    marginHorizontal: 40,
+    marginTop: 28,
+    height: 56,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+  },
+  textInput: {
+    fontFamily: "os-regular",
+    marginLeft: 4,
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    fontSize: 16,
+    color: "#1f2937",
+  },
+  listContainer: {
+    minHeight: "50%",
+    marginHorizontal: 40,
+    marginTop: 16,
+    padding: 16,
+  },
+  emptyContainer: {
+    marginTop: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ingredientRow: {
+    marginTop: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  ingredientName: {
+    fontFamily: "os-regular",
+    flex: 1,
+    color: "#334155",
+  },
+  quantityInput: {
+    fontFamily: "os-regular",
+    width: "30%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#9CA3AF",
+    paddingVertical: 0,
+    fontSize: 14,
+    color: "#1f2937",
+  },
+  buttonSubmit: {
+    backgroundColor: Colors.primary,
+    marginHorizontal: 40,
+    marginTop: 32,
+    borderRadius: 16,
+    paddingVertical: 12,
+  },
+  buttonText: {
+    textAlign: "center",
+    color: "#FFFFFF",
+  },
+});

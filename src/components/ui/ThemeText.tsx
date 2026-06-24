@@ -1,49 +1,46 @@
 import { ThemedTextProps } from "@/src/types";
-import clsx, { ClassValue } from "clsx";
-import { Text } from "react-native";
-import { extendTailwindMerge } from "tailwind-merge";
-
-const customTwMerge = extendTailwindMerge({
-  extend: {
-    classGroups: {
-      "font-size": ["text-xsm", "text-sm", "text-base", "text-lg"],
-      "text-color": [
-        "text-primary",
-        "text-secondary",
-        "text-background",
-        "text-heading",
-        "text-body",
-        "text-muted",
-      ],
-    },
-  },
-});
-
-export function cn(...inputs: ClassValue[]) {
-  return customTwMerge(clsx(inputs));
-}
+import { StyleSheet, Text } from "react-native";
+import { Colors, Fonts, FontSizes } from "../../../constants/theme";
 
 export default function ThemeText({
-  className,
+  style,
   size = "base",
   type = "default",
   ...props
 }: ThemedTextProps) {
-  const typeClasses = {
-    caption: "font-os-regular text-muted",
-    default: "font-os-regular text-body",
-    subtitle: "font-os-semibold text-heading",
-    title: "font-os-bold text-heading",
-  };
+  const finalStyle = [styles[type], styles[size], style];
 
-  const sizeClasses = {
-    xsm: "text-xsm",
-    sm: "text-sm",
-    base: "text-base",
-    lg: "text-lg",
-  };
-
-  const finalClass = cn(typeClasses[type], sizeClasses[size], className);
-
-  return <Text className={finalClass} {...props} />;
+  return <Text style={finalStyle} {...props} />;
 }
+
+const styles = StyleSheet.create({
+  caption: {
+    fontFamily: Fonts.regular,
+    color: Colors.muted || "#64748b",
+  },
+  default: {
+    fontFamily: Fonts.regular,
+    color: Colors.body || "#334155",
+  },
+  subtitle: {
+    fontFamily: Fonts.semibold,
+    color: Colors.heading || "#0f172a",
+  },
+  title: {
+    fontFamily: Fonts.bold,
+    color: Colors.heading || "#0f172a",
+  },
+
+  xsm: {
+    fontSize: FontSizes.xsm,
+  },
+  sm: {
+    fontSize: FontSizes.sm,
+  },
+  base: {
+    fontSize: FontSizes.base,
+  },
+  lg: {
+    fontSize: FontSizes.lg,
+  },
+});
