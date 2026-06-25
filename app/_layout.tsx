@@ -14,9 +14,9 @@ export default function RootLayout() {
   });
 
   useFonts({
-    regular: OpenSans_400Regular,
-    "outfit-semibold": OpenSans_600SemiBold,
-    "outfit-bold": OpenSans_700Bold,
+    "os-regular": OpenSans_400Regular,
+    "os-semibold": OpenSans_600SemiBold,
+    "os-bold": OpenSans_700Bold,
   });
 
   return (
