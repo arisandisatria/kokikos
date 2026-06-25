@@ -4,7 +4,7 @@ import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function RecipeResult() {
   const router = useRouter();
@@ -60,7 +60,7 @@ export default function RecipeResult() {
       <TouchableOpacity onPress={() => router.push("/recipe-detail")}>
         <View pointerEvents="none">
           <RecipeResultCard
-            productName="Nasi Peler Bakar"
+            productName="Nasi Telur Bakar"
             estimatedPrice="10.000"
             estimatedTime="10"
             insufficientIngridients="Daun bawang, gula, garam"
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 16,
-    marginTop: 40,
+   marginTop: StatusBar.currentHeight || 40,
   },
   header: {
     position: "relative",

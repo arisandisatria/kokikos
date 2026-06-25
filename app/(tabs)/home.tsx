@@ -7,6 +7,7 @@ import { useState } from "react";
 import {
   Alert,
   Platform,
+  StatusBar,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 16,
-    marginTop: 40,
+    marginTop: StatusBar.currentHeight || 40,
   },
   header: {
     flexDirection: "row",
