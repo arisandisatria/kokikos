@@ -35,6 +35,7 @@ export default function RecipeResult() {
 
           return (
             <TouchableOpacity
+              activeOpacity={1}
               key={filter.id}
               onPress={() => setSelectedFilter(filter.id)}
               style={[
@@ -57,17 +58,14 @@ export default function RecipeResult() {
         })}
       </View>
 
-      <TouchableOpacity onPress={() => router.push("/recipe-detail")}>
-        <View pointerEvents="none">
-          <RecipeResultCard
-            productName="Nasi Telur Bakar"
-            estimatedPrice="10.000"
-            estimatedTime="10"
-            insufficientIngridients="Daun bawang, gula, garam"
-            matchPercentage={90}
-          />
-        </View>
-      </TouchableOpacity>
+      <RecipeResultCard
+        productName="Nasi Telur Bakar"
+        estimatedPrice="10.000"
+        estimatedTime="10"
+        insufficientIngridients="Daun bawang, gula, garam"
+        matchPercentage={90}
+        onPress={() => router.push("/recipe-detail")}
+      />
     </View>
   );
 }
@@ -99,7 +97,7 @@ const styles = StyleSheet.create({
     width: "30%",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 24,
+    borderRadius: 16,
     paddingVertical: 8,
     borderWidth: 1,
   },
@@ -108,8 +106,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
   },
   tabInactive: {
-    borderColor: "#d1d5db",
-    backgroundColor: "#FFFFFF",
+    borderColor: Colors.muted,
+    backgroundColor: Colors.background,
   },
   tabText: {
     textAlign: "center",

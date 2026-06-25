@@ -23,9 +23,70 @@ function index() {
       label: "Nutrisi",
     },
   ];
-
   const mockIngredients = ["Telur", "Ikan", "Nasi", "Bawang Putih", "Jahe"]
   const mockTools = ["Wajan", "Spatula", "Sendok", "Piring", "Pisau"]
+  const mockSteps = ["Panaskan wajan", "Siram wajan", "Buang wajan", 'Beli di depan']
+
+  let content;
+
+  switch (selectedTab) {
+    case "langkah":
+      content = 
+      <View style={styles.tabContent}>
+        <ThemeText type="title" style={{ marginBottom: 8 }}>
+            Langkah:
+          </ThemeText>
+          {mockSteps.map((step, index) => (
+            <View key={index} style={styles.listItem}>
+              <ThemeText style={styles.listItemText} type="subtitle" size="sm">
+                {index + 1}. {step}
+              </ThemeText>
+            </View>
+          ))}
+      </View>
+      break
+    case "nutrisi":
+      content = 
+      <View style={{padding: 16}}>
+        <View style={styles.nutritionCard}>
+          <ThemeText size="sm" type="subtitle">Kalori</ThemeText>
+          <ThemeText size="xsm" type="caption">130 kkal</ThemeText>
+
+          <View>
+            <ThemeText>25%</ThemeText>
+          </View>
+        </View>
+      </View>
+      break
+    default:
+      content = 
+       <View style={styles.tabContent}>
+        <ThemeText type="title" style={{ marginBottom: 8 }}>
+            Bahan:
+          </ThemeText>
+          {mockIngredients.map((ingredient, index) => (
+            <View key={index} style={styles.listItem}>
+              <ThemeText style={styles.bullet}>{"\u2022"}</ThemeText>
+              <ThemeText style={styles.listItemText} type="subtitle" size="sm">
+                {ingredient}
+              </ThemeText>
+            </View>
+          ))}
+
+          <ThemeText type="title" style={{ marginTop: 12, marginBottom: 8 }}>
+            Alat:
+          </ThemeText>
+          {mockTools.map((tool, index) => (
+            <View key={index} style={styles.listItem}>
+              <ThemeText style={styles.bullet}>{"\u2022"}</ThemeText>
+              <ThemeText style={styles.listItemText} type="subtitle" size="sm">
+                {tool}
+              </ThemeText>
+            </View>
+          ))}
+      </View>
+      break
+  }
 
   return (
     <View style={styles.container}>
@@ -38,8 +99,6 @@ function index() {
         </TouchableOpacity>
         <ThemeText type="title" size="lg">Detail Pencarian</ThemeText>
       </View>
-
-
 
         <View style={styles.imageContainer}>
           <Image source={require("../../assets/images/placeholder.png")} />
@@ -71,12 +130,13 @@ function index() {
 
             return (
               <TouchableOpacity
+              activeOpacity={1}
                 key={tab.id}
                 onPress={() => setSelectedTab(tab.id)}
                 style={[
                   styles.tabButton,
                   {
-                    borderBottomWidth: isActive ? 2 : 0,
+                    borderBottomWidth: 2,
                     borderBottomColor: isActive ? Colors.primary : "transparent",
                   },
                 ]}
@@ -97,32 +157,8 @@ function index() {
         style={{flex: 1}} 
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.tabContent}>
-          <ThemeText type="title" style={{ marginBottom: 8 }}>
-            Bahan:
-          </ThemeText>
-          {mockIngredients.map((ingredient, index) => (
-            <View key={index} style={styles.listItem}>
-              <ThemeText style={styles.bullet}>{"\u2022"}</ThemeText>
-              <ThemeText style={styles.listItemText} type="subtitle" size="sm">
-                {ingredient}
-              </ThemeText>
-            </View>
-          ))}
-
-          <ThemeText type="title" style={{ marginTop: 24, marginBottom: 8 }}>
-            Alat:
-          </ThemeText>
-
-          {mockTools.map((tool, index) => (
-            <View key={index} style={styles.listItem}>
-              <ThemeText style={styles.bullet}>{"\u2022"}</ThemeText>
-              <ThemeText style={styles.listItemText} type="subtitle" size="sm">
-                {tool}
-              </ThemeText>
-            </View>
-          ))}
-        </View>
+       
+        {content}
       </ScrollView>
       </View>
   );
@@ -196,6 +232,10 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     marginRight: 4,
   },
+  nutritionCard: {
+    backgroundColor: "#fff",
+    borderRadius: 16
+  }
 });
 
 export default index;

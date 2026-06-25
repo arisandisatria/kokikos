@@ -7,6 +7,7 @@ import { useState } from "react";
 import {
   Alert,
   Platform,
+  ScrollView,
   StatusBar,
   StyleSheet,
   TextInput,
@@ -103,7 +104,11 @@ export default function Home() {
               </ThemeText>
             </View>
           ) : (
-            ingredientList.map((item) => (
+            <ScrollView 
+                    style={{flex: 1}} 
+                    showsVerticalScrollIndicator={false}
+                  >
+            {ingredientList.map((item) => (
               <View key={item.id} style={styles.ingredientRow}>
                 <ThemeText size="sm" style={styles.ingredientName}>
                   {item.name}
@@ -123,11 +128,11 @@ export default function Home() {
                   <Ionicons
                     name="close-sharp"
                     size={28}
-                    color={Colors.danger || "#ef4444"}
+                    color={Colors.danger}
                   />
                 </TouchableOpacity>
               </View>
-            ))
+            ))}</ScrollView>
           )}
         </View>
 
@@ -194,8 +199,8 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     flex: 1,
     backgroundColor: "#FFFFFF",
-    fontSize: 16,
-    color: "#1f2937",
+    fontSize: 12,
+    color: Colors.body,
   },
   listContainer: {
     minHeight: "50%",
@@ -204,7 +209,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   emptyContainer: {
-    marginTop: 32,
+    marginTop: 54,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -217,21 +222,21 @@ const styles = StyleSheet.create({
   ingredientName: {
     fontFamily: "os-regular",
     flex: 1,
-    color: "#334155",
+    color: Colors.body,
   },
   quantityInput: {
     fontFamily: "os-regular",
     width: "30%",
     borderBottomWidth: 1,
-    borderBottomColor: "#9CA3AF",
+    borderBottomColor: Colors.body,
     paddingVertical: 0,
-    fontSize: 14,
-    color: "#1f2937",
+    fontSize: 12,
+    color: Colors.body,
   },
   buttonSubmit: {
     backgroundColor: Colors.primary,
     marginHorizontal: 40,
-    marginTop: 32,
+    marginTop: 16,
     borderRadius: 16,
     paddingVertical: 12,
   },

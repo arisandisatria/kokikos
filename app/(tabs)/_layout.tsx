@@ -1,8 +1,8 @@
+import { Colors } from "@/constants/theme";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors } from "../../constants/theme";
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -12,17 +12,17 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: "#FF6B35",
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: "#CDCDE0",
         tabBarIconStyle: {
           height: "100%",
           width: "100%",
         },
         tabBarStyle: {
-          backgroundColor: Colors.primary || "#1e293b",
+          backgroundColor: "#fff",
           borderTopWidth: 0,
           height: 60 + insets.bottom,
-          elevation: 0,
+          elevation: 2,
           paddingBottom: insets.bottom + (Platform.OS === "android" ? 10 : 0),
           paddingTop: 10,
           borderTopRightRadius: 16,
@@ -35,7 +35,10 @@ export default function TabLayout() {
         name="home"
         options={{
           tabBarIcon: ({ color, focused }) => (
-            <View style={styles.iconContainer}>
+            <View style={ {
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
               <Ionicons
                 name={focused ? "home" : "home-outline"}
                 size={28}
@@ -76,10 +79,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  iconContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
