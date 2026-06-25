@@ -17,4 +17,5 @@ export interface RecipeResultCardProps {
   estimatedPrice: string;
   insufficientIngridients: string;
   matchPercentage: number;
+  onPress?: () => void;
 }
