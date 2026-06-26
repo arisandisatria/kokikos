@@ -2,6 +2,7 @@ import { Colors } from "@/constants/theme";
 import ThemeText from "@/src/components/ui/ThemeText";
 import { Ingredient } from "@/src/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { NavigationBar } from "expo-navigation-bar";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -22,7 +23,7 @@ export default function Home() {
 
   function handleAddIngredient() {
     if (ingredient.trim() === "") {
-      Alert.alert("Cuy!", "Tulis nama bahannya dulu dong.");
+      Alert.alert("Cuy!", "Tulis nama bahannya dulu dong!");
       return;
     }
 
@@ -37,6 +38,11 @@ export default function Home() {
   }
 
   function handleRemoveIngredient(id: string) {
+    if (!id) {
+      Alert.alert("Gagal!", `Item dengan id:${id} tidak ditemukan!`);
+      return;
+    }
+
     const updateIngredientList = ingredientList.filter(
       (item) => item.id !== id,
     );
@@ -44,6 +50,16 @@ export default function Home() {
   }
 
   function handleUpdateIngredientQuantity(quantity: string, id: string) {
+    if (!quantity || !id) {
+      Alert.alert("Gagal!", `Item dengan id:${id} tidak ditemukan!`);
+      return;
+    }
+
+    if (typeof quantity !== "number") {
+      Alert.alert("Gagal!", `Quantity bukan bertipe angka!`);
+      return;
+    }
+    
     const updateIngredientQuantity = ingredientList.map((item) => {
       if (item.id === id) {
         return {
@@ -59,6 +75,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
+      <NavigationBar hidden />
       <View style={styles.header}>
         <ThemeText type="title" size="lg">
           Halo,{" "}
@@ -68,7 +85,7 @@ export default function Home() {
           !
         </ThemeText>
         <TouchableOpacity>
-          <Ionicons name="person-circle-outline" size={50} color="black" />
+          <Ionicons name="person-circle-outline" size={50} color={Colors.secondary} />
         </TouchableOpacity>
       </View>
 
@@ -87,7 +104,7 @@ export default function Home() {
             onSubmitEditing={handleAddIngredient}
           />
           <TouchableOpacity onPress={handleAddIngredient}>
-            <Ionicons name="add-circle" size={32} color="#2A9D8F" />
+            <Ionicons name="add-circle" size={32} color={Colors.secondary} />
           </TouchableOpacity>
         </View>
 
@@ -220,12 +237,10 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   ingredientName: {
-    fontFamily: "os-regular",
     flex: 1,
     color: Colors.body,
   },
   quantityInput: {
-    fontFamily: "os-regular",
     width: "30%",
     borderBottomWidth: 1,
     borderBottomColor: Colors.body,
