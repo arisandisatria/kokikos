@@ -1,3 +1,5 @@
+import { askGemini } from "@/config/AIModel";
+import prompt from "@/constants/prompt";
 import { Colors } from "@/constants/theme";
 import ThemeText from "@/src/components/ui/ThemeText";
 import { Ingredient } from "@/src/types";
@@ -6,6 +8,7 @@ import { NavigationBar } from "expo-navigation-bar";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Platform,
   ScrollView,
@@ -20,6 +23,8 @@ export default function Home() {
   const router = useRouter();
   const [ingredient, setIngredient] = useState("");
   const [ingredientList, setIngredientsList] = useState<Ingredient[]>([]);
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
 
   function handleAddIngredient() {
     if (ingredient.trim() === "") {
@@ -50,17 +55,7 @@ export default function Home() {
   }
 
   function handleUpdateIngredientQuantity(quantity: string, id: string) {
-    if (!quantity || !id) {
-      Alert.alert("Gagal!", `Item dengan id:${id} tidak ditemukan!`);
-      return;
-    }
-
-    if (typeof quantity !== "number") {
-      Alert.alert("Gagal!", `Quantity bukan bertipe angka!`);
-      return;
-    }
-    
-    const updateIngredientQuantity = ingredientList.map((item) => {
+      const updateIngredientQuantity = ingredientList.map((item) => {
       if (item.id === id) {
         return {
           ...item,
@@ -72,6 +67,39 @@ export default function Home() {
 
     setIngredientsList(updateIngredientQuantity);
   }
+
+  async function handleSearchRecipe() {
+    if (ingredientList.length === 0) {
+      Alert.alert("Gagal!", `Tidak ada bahan-bahan!`);
+      return;
+    }
+
+    setLoading(true)
+    setResponse("")
+
+    const userPrompt =`Berikut adalah bahan yang dimiliki pengguna: ${ingredientList + prompt.RECIPE}`
+
+    try {
+      const result = await askGemini(userPrompt)
+
+      if (!result|| !result.trim()) {
+        Alert.alert("Gagal!", `Resep tidak ditemukan`);
+        return;
+      }
+
+      setResponse(result)
+      setIngredient("")
+      setIngredientsList([])
+      // router.push("/recipe-result")
+    } catch (error) {
+      console.error("Gemini Error:", error);
+      Alert.alert("Gagal!", `Ada kesalahan dari AI atau server!`);
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  console.log(response)
 
   return (
     <View style={styles.container}>
@@ -155,11 +183,18 @@ export default function Home() {
 
         {ingredientList.length > 0 && (
           <TouchableOpacity
-            style={styles.buttonSubmit}
-            onPress={() => router.push("/recipe-result")}
+            style={[styles.buttonSubmit, {
+                  backgroundColor: !loading ? Colors.primary : Colors.muted,
+            }]}
+            onPress={handleSearchRecipe}
+            disabled={loading}
           >
+            {loading && (
+              <ActivityIndicator size="small" color="#fff" style={styles.spinner} />
+            )}
+            
             <ThemeText size="base" type="title" style={styles.buttonText}>
-              Cari Resep
+              {loading ? "Mencari Resep..." : "Cari Resep"}
             </ThemeText>
           </TouchableOpacity>
         )}
@@ -249,14 +284,18 @@ const styles = StyleSheet.create({
     color: Colors.body,
   },
   buttonSubmit: {
-    backgroundColor: Colors.primary,
     marginHorizontal: 40,
     marginTop: 16,
     borderRadius: 16,
     paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  spinner: {
+    marginRight: 8,
   },
   buttonText: {
-    textAlign: "center",
     color: "#FFFFFF",
   },
 });
