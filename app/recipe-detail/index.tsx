@@ -2,10 +2,10 @@ import { Colors } from "@/constants/theme";
 import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Image, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { BackHandler, Image, Platform, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
 
-function index() {
+export default function index() {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState("bahan-alat");
 
@@ -23,9 +23,73 @@ function index() {
       label: "Nutrisi",
     },
   ];
-  const mockIngredients = ["Telur", "Ikan", "Nasi", "Bawang Putih", "Jahe"]
+  const mockIngredients = [{ingredient: "Telur", quantity: "1 butir"}, {ingredient: "Ikan", quantity: "2 ekor"}, {ingredient: "Nasi", quantity: "1 bakul"}, {ingredient: "Bawang Putih", quantity: "1 siung"}, {ingredient: "Jahe", quantity: "1 buah"}]
   const mockTools = ["Wajan", "Spatula", "Sendok", "Piring", "Pisau"]
   const mockSteps = ["Panaskan wajan", "Siram wajan", "Buang wajan", 'Beli di depan']
+  const mockNutrition= [
+    {
+      type: "Kalori",
+      weight: "130 kkal",
+      percentage: "15%"
+    },
+    {
+      type: "Karbo",
+      weight: "20 gram",
+      percentage: "80%"
+    },
+    {
+      type: "Protein",
+      weight: "7 gram",
+      percentage: "5%"
+    },
+    {
+      type: "Kalori",
+      weight: "130 kkal",
+      percentage: "15%"
+    },
+    {
+      type: "Karbo",
+      weight: "20 gram",
+      percentage: "80%"
+    },
+    {
+      type: "Protein",
+      weight: "7 gram",
+      percentage: "5%"
+    },
+    {
+      type: "Kalori",
+      weight: "130 kkal",
+      percentage: "15%"
+    },
+    {
+      type: "Karbo",
+      weight: "20 gram",
+      percentage: "80%"
+    },
+    {
+      type: "Protein",
+      weight: "7 gram",
+      percentage: "5%"
+    },
+  ]
+
+  useEffect(() => {
+      const handleBackPress = () => {
+        router.replace("/recipe-result");
+        return true;
+      };
+  
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        handleBackPress,
+      );
+  
+      return () => {
+        backHandler.remove();
+      };
+  
+    }, []);
 
   let content;
 
@@ -44,31 +108,38 @@ function index() {
             </View>
           ))}
       </View>
-      break
+      break;
     case "nutrisi":
       content = 
-      <View style={{padding: 16}}>
-        <View style={styles.nutritionCard}>
-          <ThemeText size="sm" type="subtitle">Kalori</ThemeText>
-          <ThemeText size="xsm" type="caption">130 kkal</ThemeText>
+      <View style={styles.nutritionContainer}>
+        {
+          mockNutrition.map((item, index) => (
+            <View key={index} style={styles.nutritionCard}>
+              <ThemeText size="sm" type="subtitle">{item.type}</ThemeText>
+              <ThemeText size="xsm" type="caption">{item.weight}</ThemeText>
 
-          <View>
-            <ThemeText>25%</ThemeText>
-          </View>
-        </View>
+              <View style={styles.circleBadge}>
+                <ThemeText style={styles.circleText} type="subtitle">{item.percentage}</ThemeText>
+              </View>
+            </View>
+        ))
+      }
       </View>
-      break
+      break;
     default:
       content = 
-       <View style={styles.tabContent}>
+      <View style={styles.tabContent}>
         <ThemeText type="title" style={{ marginBottom: 8 }}>
             Bahan:
           </ThemeText>
-          {mockIngredients.map((ingredient, index) => (
-            <View key={index} style={styles.listItem}>
+          {mockIngredients.map((item, index) => (
+            <View  key={index} style={styles.listItem}>
               <ThemeText style={styles.bullet}>{"\u2022"}</ThemeText>
               <ThemeText style={styles.listItemText} type="subtitle" size="sm">
-                {ingredient}
+                {item.ingredient}
+              </ThemeText>
+              <ThemeText type="subtitle" size="sm">
+                {item.quantity}
               </ThemeText>
             </View>
           ))}
@@ -85,8 +156,8 @@ function index() {
             </View>
           ))}
       </View>
-      break
-  }
+      break;
+    }
 
   return (
     <View style={styles.container}>
@@ -154,13 +225,14 @@ function index() {
         </View>
 
         <ScrollView 
-        style={{flex: 1}} 
+        style={{flex: 1, backgroundColor: selectedTab == "nutrisi" ? undefined :"#fff"}} 
+        contentContainerStyle={{flexGrow: 1}}
         showsVerticalScrollIndicator={false}
       >
        
         {content}
       </ScrollView>
-      </View>
+    </View>
   );
 }
 
@@ -207,14 +279,24 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     backgroundColor: "#fff",
-    alignItems: "center"
+    alignItems: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 7 },
+        shadowOpacity: 0.05,
+        shadowRadius: 7,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   tabButton: {
     width: "33.333%",
     paddingVertical: 18,
   },
   tabContent: {
-    backgroundColor: "#fff",
     padding: 16
   },
   listItem: {
@@ -232,10 +314,41 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     marginRight: 4,
   },
+  nutritionContainer: {
+    padding: 16,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between", 
+    rowGap: 20,
+  },
   nutritionCard: {
     backgroundColor: "#fff",
-    borderRadius: 16
+    padding: 12,
+    alignItems: "center",
+    borderRadius: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 7 },
+        shadowOpacity: 0.05,
+        shadowRadius: 7,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  circleBadge: {
+    marginTop: 6,
+    width: 56,         
+    height: 56,        
+    borderRadius: 28,  
+    backgroundColor: Colors.secondary,
+    justifyContent: "center",
+    alignItems: "center",    
+  },
+  circleText: {
+    color: "#fff",
+    textAlign: "center",
   }
 });
-
-export default index;

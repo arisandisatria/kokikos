@@ -3,8 +3,8 @@ import RecipeResultCard from "@/src/components/features/RecipeResultCard";
 import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { BackHandler, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function RecipeResult() {
   const router = useRouter();
@@ -15,6 +15,24 @@ export default function RecipeResult() {
     { id: "murah", label: "Termurah" },
     { id: "cepat", label: "Tercepat" },
   ];
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      router.replace("/home");
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+
+  }, []);
+
 
   return (
     <View style={styles.container}>
@@ -117,6 +135,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   textInactive: {
-    color: "#6b7280",
+    color: Colors.muted,
   },
 });
