@@ -12,10 +12,10 @@ export interface ThemedTextProps extends TextProps {
 }
 
 export interface RecipeResultCardProps {
-  productName: string;
-  estimatedTime: string;
-  estimatedPrice: string;
-  insufficientIngridients: string;
-  matchPercentage: number;
+  recipe_name: string,
+  estimated_time: number,
+  budget: number,
+  ingredient_match: number,
+  ingredient_shortage: string,
   onPress?: () => void;
 }

@@ -2,14 +2,17 @@ import { Colors } from "@/constants/theme";
 import RecipeResultCard from "@/src/components/features/RecipeResultCard";
 import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { BackHandler, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function RecipeResult() {
   const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState("cocok");
-
+  const {recipesParam} = useLocalSearchParams()
+  // const recipes = JSON.parse(recipesParam as string)
+  const {recipe_name, description, banner_image, estimated_time, budget, ingredient_match, ingredient_shortage, ingredients_and_tools} = JSON.parse(recipesParam as string)
+  
   const filters = [
     { id: "cocok", label: "Paling Cocok" },
     { id: "murah", label: "Termurah" },
@@ -77,11 +80,11 @@ export default function RecipeResult() {
       </View>
 
       <RecipeResultCard
-        productName="Nasi Telur Bakar"
-        estimatedPrice="10.000"
-        estimatedTime="10"
-        insufficientIngridients="Daun bawang, gula, garam"
-        matchPercentage={90}
+        recipe_name={recipe_name}
+        estimated_time={estimated_time}
+        budget={budget}
+        ingredient_match={ingredient_match}
+        ingredient_shortage={ingredient_shortage}
         onPress={() => router.push("/recipe-detail")}
       />
     </View>

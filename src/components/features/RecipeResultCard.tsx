@@ -5,11 +5,11 @@ import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import ThemeText from "../ui/ThemeText";
 
 function RecipeResultCard({
-  productName,
-  estimatedTime,
-  estimatedPrice,
-  insufficientIngridients,
-  matchPercentage,
+  recipe_name,
+  estimated_time,
+  budget,
+  ingredient_match,
+  ingredient_shortage,
   onPress
 }: RecipeResultCardProps) {
   return (
@@ -21,13 +21,13 @@ function RecipeResultCard({
       />
 
       <View style={styles.contentContainer} >
-        <ThemeText size="sm">{productName}</ThemeText>
+        <ThemeText size="sm">{recipe_name}</ThemeText>
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
             <Ionicons name="time-outline" size={17} color={Colors.secondary} />
             <ThemeText size="xsm" type="caption">
-              {estimatedTime} menit
+              {estimated_time} menit
             </ThemeText>
           </View>
           
@@ -36,19 +36,19 @@ function RecipeResultCard({
           <View style={styles.infoItem}>
             <Ionicons name="cash-outline" size={17} color={Colors.secondary} />
             <ThemeText size="xsm" type="caption">
-              {estimatedPrice}
+              {budget}
             </ThemeText>
           </View>
         </View>
 
         <ThemeText size="xsm" style={styles.missingIngredients}>
-          Kurang: {insufficientIngridients}
+          Kurang: {ingredient_shortage}
         </ThemeText>
       </View>
 
       <View style={styles.badgeContainer}>
         <ThemeText type="subtitle" size="xsm" style={styles.badgeText}>
-          {matchPercentage}%
+          {ingredient_match}%
         </ThemeText>
       </View>
     </TouchableOpacity>

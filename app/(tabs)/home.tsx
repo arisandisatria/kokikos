@@ -90,7 +90,13 @@ export default function Home() {
       setResponse(result)
       setIngredient("")
       setIngredientsList([])
-      // router.push("/recipe-result")
+      router.push({
+                pathname: "/recipe-result",
+                params: {
+                  recipesParams: JSON.stringify(response),
+                },
+              })
+
     } catch (error) {
       console.error("Gemini Error:", error);
       Alert.alert("Gagal!", `Ada kesalahan dari AI atau server!`);
@@ -98,8 +104,6 @@ export default function Home() {
       setLoading(false)
     }
   }
-
-  console.log(response)
 
   return (
     <View style={styles.container}>
