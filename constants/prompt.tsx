@@ -1,5 +1,5 @@
 export default {
-    RECIPE: `: Anda sebagai chef terbaik
+    RECIPE: `. Anda sebagai chef terbaik
     - Pengguna ingin mencari resep makanan sesuai dengan bahan-bahan tersebut dan budget seminimal mungkin dalam rupiah
     - Hasilkan seluruh resep dengan nama resep, estimasi waktu pembuatan(dalam menit), budget, bahan yang kurang(apabila ada), deskripsi makanan, dan berapa persen bahan yang ada dari user dengan bahan dari resep(angka saja tanpa tanda %)
     - Pastikan untuk menambahkan bahan, alat, langkah-langkah, nutrisi(tipe, takaran, dan berapa persennya), dan rating seberapa sulit pembuatan makanan ini(1-10)

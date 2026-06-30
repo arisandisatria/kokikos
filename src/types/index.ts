@@ -11,6 +11,10 @@ export interface ThemedTextProps extends TextProps {
   size?: "xsm" | "sm" | "base" | "lg";
 }
 
+export interface ThemedTextInputProps extends TextProps {
+  type?: "default" | "password";
+}
+
 export interface RecipeResultCardProps {
   recipe_name: string,
   estimated_time: number,

@@ -3,6 +3,7 @@ import prompt from "@/constants/prompt";
 import { Colors } from "@/constants/theme";
 import ThemeText from "@/src/components/ui/ThemeText";
 import { Ingredient } from "@/src/types";
+import { supabase } from "@/utils/supabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { NavigationBar } from "expo-navigation-bar";
 import { useRouter } from "expo-router";
@@ -34,7 +35,7 @@ export default function Home() {
 
     const newIngredient: Ingredient = {
       id: Date.now().toString(),
-      name: ingredient,
+      name: ingredient.trim(),
       quantity: "",
     };
 
@@ -55,7 +56,7 @@ export default function Home() {
   }
 
   function handleUpdateIngredientQuantity(quantity: string, id: string) {
-      const updateIngredientQuantity = ingredientList.map((item) => {
+    const updateIngredientQuantity = ingredientList.map((item) => {
       if (item.id === id) {
         return {
           ...item,
@@ -70,33 +71,80 @@ export default function Home() {
 
   async function handleSearchRecipe() {
     if (ingredientList.length === 0) {
-      Alert.alert("Gagal!", `Tidak ada bahan-bahan!`);
+      Alert.alert("Gagal!", "Daftar bahan tidak boleh kosong!");
       return;
     }
 
     setLoading(true)
     setResponse("")
 
-    const userPrompt =`Berikut adalah bahan yang dimiliki pengguna: ${ingredientList + prompt.RECIPE}`
+    const searchExistingRecipe = ingredientList.map((item)=> item.name.toLowerCase())
 
     try {
+      const {data: existingRecipe, error: dbError} = await supabase.from("recipes").select("*").contains("search_keywords", searchExistingRecipe)
+
+      if (existingRecipe && existingRecipe.length > 0) {
+        setResponse(existingRecipe[0])
+        setLoading(false)
+         router.push({
+                pathname: "/recipe-result",
+                params: {
+                  recipesParams: JSON.stringify(existingRecipe[0]),
+                },
+              })
+        return
+      }
+
+      const userPrompt =`Berikut adalah bahan yang dimiliki pengguna: ${ingredientList + prompt.RECIPE}`
+      
       const result = await askGemini(userPrompt)
 
-      if (!result|| !result.trim()) {
-        Alert.alert("Gagal!", `Resep tidak ditemukan`);
+      if (!result) {
+        Alert.alert("Gagal!", `Resep tidak dapat diproses!`);
         return;
+      }
+
+      const cleanedJsonString = result.replace(/```json/gi, "").replace(/```/gi, "").trim();
+      const parsedResult = JSON.parse(cleanedJsonString);
+
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.user?.id) {
+        Alert.alert("Gagal!", "Sesi pengguna tidak ditemukan. Silakan login ulang.");
+        return;
+    }
+
+      const {error: insertDataError} = await supabase.from("recipes").insert([
+        {
+          user_id: session.user.id,
+          recipe_name: parsedResult.recipe_name,
+          description: parsedResult.description,
+          estimated_time: parsedResult.estimated_time,
+          budget: parsedResult.budget,
+          ingredient_match: parsedResult.ingredient_match,
+          ingredient_shortage: parsedResult.ingredient_shortage,
+          ingredients_and_tools: parsedResult.ingredients_and_tools,
+          steps: parsedResult.steps,
+          nutrition: parsedResult.nutrition,
+          search_keywords: searchExistingRecipe
+        }
+      ])
+
+      if (insertDataError) {
+        console.error("Supabase Insert Error:", insertDataError);
+        Alert.alert("Gagal!", `Gagal menyimpan error!`);
+        return
       }
 
       setResponse(result)
       setIngredient("")
       setIngredientsList([])
       router.push({
-                pathname: "/recipe-result",
-                params: {
-                  recipesParams: JSON.stringify(response),
-                },
-              })
-
+            pathname: "/recipe-result",
+            params: {
+              recipesParams: JSON.stringify(parsedResult), 
+            },
+      });
     } catch (error) {
       console.error("Gemini Error:", error);
       Alert.alert("Gagal!", `Ada kesalahan dari AI atau server!`);
@@ -111,7 +159,7 @@ export default function Home() {
       <View style={styles.header}>
         <ThemeText type="title" size="lg">
           Halo,{" "}
-          <ThemeText type="title" size="lg" style={styles.textPrimary}>
+          <ThemeText type="title" size="lg" style={{color: Colors.primary}}>
             Sandi
           </ThemeText>
           !
@@ -121,14 +169,17 @@ export default function Home() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.mainContent}>
-        <ThemeText type="title" style={styles.textCenter}>
+      <View style={{marginTop: 48,}}>
+        <ThemeText type="title" style={{ textAlign: "center",}}>
           Lagi laper? Ada bahan apa nih?
         </ThemeText>
 
         <View style={[styles.card, styles.inputBar]}>
           <TextInput
-            style={styles.textInput}
+            style={[
+                    styles.textInput,
+                    ingredient === '' ? styles.textInput : styles.textInput
+                  ]}
             placeholderTextColor={Colors.muted}
             placeholder="telur, sawi, tempe..."
             value={ingredient}
@@ -148,13 +199,13 @@ export default function Home() {
           {ingredientList.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Ionicons name="basket-outline" size={40} color={Colors.muted} />
-              <ThemeText size="sm" type="caption" style={styles.textCenter}>
+              <ThemeText size="sm" type="caption" style={{ textAlign: "center",}}>
                 Keranjang masih kosong nih
               </ThemeText>
             </View>
           ) : (
             <ScrollView 
-                    style={{flex: 1}} 
+                    style={{flex: 1, marginTop: 10}} 
                     showsVerticalScrollIndicator={false}
                   >
             {ingredientList.map((item) => (
@@ -194,10 +245,10 @@ export default function Home() {
             disabled={loading}
           >
             {loading && (
-              <ActivityIndicator size="small" color="#fff" style={styles.spinner} />
+              <ActivityIndicator size="small" color="#fff" style={{ marginRight: 8,}} />
             )}
             
-            <ThemeText size="base" type="title" style={styles.buttonText}>
+            <ThemeText size="base" type="title" style={{ color: "#FFFFFF",}}>
               {loading ? "Mencari Resep..." : "Cari Resep"}
             </ThemeText>
           </TouchableOpacity>
@@ -217,15 +268,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-  },
-  textPrimary: {
-    color: Colors.primary,
-  },
-  mainContent: {
-    marginTop: 48,
-  },
-  textCenter: {
-    textAlign: "center",
   },
   card: {
     backgroundColor: "#FFFFFF",
@@ -270,7 +312,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   ingredientRow: {
-    marginTop: 12,
+    marginTop: 6,
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
@@ -286,20 +328,15 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     fontSize: 12,
     color: Colors.body,
+    fontFamily: "os-regular"
   },
   buttonSubmit: {
     marginHorizontal: 40,
-    marginTop: 16,
+    marginTop: 20,
     borderRadius: 16,
     paddingVertical: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-  },
-  spinner: {
-    marginRight: 8,
-  },
-  buttonText: {
-    color: "#FFFFFF",
   },
 });
