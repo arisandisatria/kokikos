@@ -25,7 +25,6 @@ export default function Home() {
   const router = useRouter();
   const [ingredient, setIngredient] = useState("");
   const [ingredientList, setIngredientsList] = useState<Ingredient[]>([]);
-  const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const context = useContext(UserDetailContext);
 
@@ -84,7 +83,6 @@ export default function Home() {
     }
 
     setLoading(true)
-    setResponse("")
 
     const searchExistingRecipe = ingredientList.map((item)=> item.name.toLowerCase())
 
@@ -92,7 +90,6 @@ export default function Home() {
       const {data: existingRecipe, error: dbError} = await supabase.from("recipes").select("*").contains("search_keywords", searchExistingRecipe)
 
       if (existingRecipe && existingRecipe.length > 0) {
-        setResponse(existingRecipe[0])
         setLoading(false)
          router.push({
                 pathname: "/recipe-result",
@@ -113,7 +110,11 @@ export default function Home() {
       }
 
       const cleanedJsonString = result.replace(/```json/gi, "").replace(/```/gi, "").trim();
-      const parsedResult = JSON.parse(cleanedJsonString);
+    const parsedResult = JSON.parse(cleanedJsonString);
+
+    const recipeData = parsedResult.recipe && Array.isArray(parsedResult.recipe)
+      ? parsedResult.recipe[0]
+      : parsedResult;
 
       const { data: { session } } = await supabase.auth.getSession();
 
@@ -121,22 +122,23 @@ export default function Home() {
         Alert.alert("Gagal!", "Sesi pengguna tidak ditemukan. Silakan login ulang.");
         return;
     }
+      const firstRecipe = parsedResult.recipe?.[0] || parsedResult;
 
-      const {error: insertDataError} = await supabase.from("recipes").insert([
-        {
-          user_id: session.user.id,
-          recipe_name: parsedResult.recipe_name,
-          description: parsedResult.description,
-          estimated_time: parsedResult.estimated_time,
-          budget: parsedResult.budget,
-          ingredient_match: parsedResult.ingredient_match,
-          ingredient_shortage: parsedResult.ingredient_shortage,
-          ingredients_and_tools: parsedResult.ingredients_and_tools,
-          steps: parsedResult.steps,
-          nutrition: parsedResult.nutrition,
-          search_keywords: searchExistingRecipe
-        }
-      ])
+      const { error: insertDataError } = await supabase.from("recipes").insert([
+      {
+        user_id: session.user.id,
+        recipe_name: recipeData.recipe_name || "Resep Tanpa Nama",
+        description: recipeData.description || "",
+        estimated_time: recipeData.estimated_time || "",
+        budget: recipeData.budget || "",
+        ingredient_match: recipeData.ingredient_match || "",
+        ingredient_shortage: recipeData.ingredient_shortage || "",
+        ingredients_and_tools: recipeData.ingredients_and_tools ? JSON.stringify(recipeData.ingredients_and_tools) : "",
+        steps: recipeData.steps ? JSON.stringify(recipeData.steps) : "",
+        nutrition: recipeData.nutrition ? JSON.stringify(recipeData.nutrition) : "",
+        search_keywords: searchExistingRecipe
+      }
+    ]);
 
       if (insertDataError) {
         console.error("Supabase Insert Error:", insertDataError);
@@ -144,13 +146,12 @@ export default function Home() {
         return
       }
 
-      setResponse(result)
       setIngredient("")
       setIngredientsList([])
       router.push({
             pathname: "/recipe-result",
             params: {
-              recipesParams: JSON.stringify(parsedResult), 
+              recipesParams: JSON.stringify(firstRecipe), 
             },
       });
     } catch (error) {
@@ -160,8 +161,6 @@ export default function Home() {
       setLoading(false)
     }
   }
-
-  console.log(userDetail)
 
   return (
     <View style={styles.container}>
@@ -233,6 +232,7 @@ export default function Home() {
                   }
                 />
                 <TouchableOpacity
+                  disabled={loading}
                   onPress={() => handleRemoveIngredient(item.id)}
                 >
                   <Ionicons

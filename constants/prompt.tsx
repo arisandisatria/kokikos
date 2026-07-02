@@ -4,14 +4,14 @@ export default {
     - Hasilkan seluruh resep dengan nama resep, estimasi waktu pembuatan(dalam menit), budget, bahan yang kurang(apabila ada), deskripsi makanan, dan berapa persen bahan yang ada dari user dengan bahan dari resep(angka saja tanpa tanda %)
     - Pastikan untuk menambahkan bahan, alat, langkah-langkah, nutrisi(tipe, takaran, dan berapa persennya), dan rating seberapa sulit pembuatan makanan ini(1-10)
     - **Hasilkan resep dalam format JSON valid**
-    - **Hasilkan 10 resep yang berbeda sesuai dengan bahan-bahan tersebut. Mulai dari resep dengan kekurangan bahan paling sedikit ke yang paling banyak**
+    - **Hasilkan TEPAT 1 resep terbaik berdasarkan bahan yang diberikan**
+    - **Wajib mengembalikan format JSON murni berbentuk SINGLE OBJECT (bukan array, dan jangan dibungkus dalam key "recipe").**
     - **Gunakan tanda kutip ganda ("") untuk semua kunci dan string**
     - **Tidak ada komentar, tidak ada teks tambahan di luar JSON**
     - **Mulai dengan { "recipe": [ ... ] }**
     - **BATASI JUMLAH KARAKTER SEBANYAK 8000 KARAKTER SAJA. TIDAK LEBIH DARI 7500 KARAKTER**
     - Contoh output:
-        "recipe": [
-          {
+        {
             "recipe_name": "Nasi Telur Pontianak",
             "description": "Deskripsi resep...",
             "estimated_time": "10",
@@ -48,7 +48,6 @@ export default {
               }
             ],
           }
-        ]
     - **Hanya JSON! Tidak ada teks lain sebelum atau sesudah output.**
     `,
 };

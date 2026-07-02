@@ -10,7 +10,7 @@ import {
 } from "@expo-google-fonts/open-sans";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function RootLayout() {
@@ -25,11 +25,7 @@ export default function RootLayout() {
     "os-semibold": OpenSans_600SemiBold,
     "os-bold": OpenSans_700Bold,
   });
-  useFonts({
-    "os-regular": OpenSans_400Regular,
-    "os-semibold": OpenSans_600SemiBold,
-    "os-bold": OpenSans_700Bold,
-  });
+
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -44,10 +40,12 @@ export default function RootLayout() {
         return;
       }
 
+      const firstName = profile.name ? profile.name.trim().split(" ")[0] : "User Keren";
+
       if (profile) {
         setUserDetail({
           id: profile.id,
-          name: profile.name,
+          name: firstName,
           email: profile.email,
           phone_number: profile.phone_number || undefined,
         });
@@ -62,10 +60,8 @@ export default function RootLayout() {
       setHasSession(!!session);
       
       if (session?.user) {
-        // Jika sesi terdeteksi, langsung isi context dari database
         await fetchUserProfile(session.user.id);
       } else {
-        // Jika logout, kosongkan context
         setUserDetail(null);
       }
       
@@ -75,19 +71,22 @@ export default function RootLayout() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Proteksi Rute (Auth Guard)
   useEffect(() => {
-    if (!isAuthReady) return;
+    if (!isAuthReady || !fontsLoaded) return;
 
     const firstSegment = segments[0] as string;
     const inAuthGroup = firstSegment === "auth";
 
-    if (hasSession && inAuthGroup) {
-      router.replace("/home");
-    } else if (!hasSession && !inAuthGroup) {
-      router.replace("/auth/SignIn");
+   if (hasSession) {
+      if (inAuthGroup || !firstSegment) {
+        router.replace("/home");
+      }
+    } else {
+      if (!inAuthGroup) {
+        router.replace("/auth/SignIn");
+      }
     }
-  }, [hasSession, segments, isAuthReady]);
+  }, [hasSession, segments, isAuthReady, fontsLoaded]);
 
   if (!isAuthReady || !fontsLoaded) {
     return (
@@ -105,14 +104,26 @@ export default function RootLayout() {
       >
 
         <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-            }}
-          ></Stack>
+         <Stack screenOptions={{ headerShown: false }} />
+
+          {(!isAuthReady || !fontsLoaded) && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+          )}
         </UserDetailContext.Provider>
       </SafeAreaView>
     </SafeAreaProvider>
 
   );
 }
+
+const styles = StyleSheet.create({
+  loadingOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: "#0f172a",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+});

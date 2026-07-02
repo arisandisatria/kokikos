@@ -80,7 +80,8 @@ export default function SignUp() {
           {
             id: authData.user.id,
             name: userAccount.fullname.trim(),
-            email: userAccount.email.trim()
+            email: userAccount.email.trim(),
+            phone_number: userAccount.phone_number.trim()
           }
         ])
         if (profileError) {
