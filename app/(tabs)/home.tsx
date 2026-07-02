@@ -1,13 +1,14 @@
 import { askGemini } from "@/config/AIModel";
 import prompt from "@/constants/prompt";
 import { Colors } from "@/constants/theme";
+import { UserDetailContext } from "@/context/UserDetailContext";
 import ThemeText from "@/src/components/ui/ThemeText";
 import { Ingredient } from "@/src/types";
 import { supabase } from "@/utils/supabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { NavigationBar } from "expo-navigation-bar";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -26,6 +27,13 @@ export default function Home() {
   const [ingredientList, setIngredientsList] = useState<Ingredient[]>([]);
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
+  const context = useContext(UserDetailContext);
+
+  if (!context) {
+    return null;
+  }
+
+  const { userDetail } = context;
 
   function handleAddIngredient() {
     if (ingredient.trim() === "") {
@@ -153,6 +161,8 @@ export default function Home() {
     }
   }
 
+  console.log(userDetail)
+
   return (
     <View style={styles.container}>
       <NavigationBar hidden />
@@ -160,7 +170,7 @@ export default function Home() {
         <ThemeText type="title" size="lg">
           Halo,{" "}
           <ThemeText type="title" size="lg" style={{color: Colors.primary}}>
-            Sandi
+            {userDetail?.name}
           </ThemeText>
           !
         </ThemeText>

@@ -23,3 +23,10 @@ export interface RecipeResultCardProps {
   ingredient_shortage: string,
   onPress?: () => void;
 }
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone_number?: string;
+}

@@ -1,13 +1,105 @@
 import { Colors } from "@/constants/theme";
+import { UserDetailContext } from "@/context/UserDetailContext";
 import ThemeText from "@/src/components/ui/ThemeText";
+import { supabase } from "@/utils/supabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as Crypto from 'expo-crypto';
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Platform, StatusBar, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { useContext, useState } from "react";
+import { ActivityIndicator, Alert, Platform, StatusBar, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function SignIn() {
   const router = useRouter()
   const [isSecured, setIsSecured] = useState(true)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const context = useContext(UserDetailContext);
+
+  if (!context) {
+    throw new Error("fetchUserProfile harus digunakan di dalam UserDetailContext.Provider");
+  }
+
+  const { userDetail, setUserDetail } = context;
+  
+  const fetchUserProfile = async () => {
+    try {
+      const {data: { user }, error: authError} = await supabase.auth.getUser()
+  
+      if (authError || !user) {
+        console.error("User belum login atau session habis:", authError);
+        return;
+      }
+    
+      const {data: profile, error: profileError} = await supabase.from("profiles").select("id, name, email, phone_number").eq("id", user.id).single()
+  
+      if (profileError) {
+        console.error("Gagal query ke tabel profiles:", profileError);
+        return;
+      }
+  
+      if (profile) {
+        setUserDetail({
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          phone_number: profile.phone_number || undefined
+        });
+      }
+    }
+    catch(error) {
+      console.error("Terjadi kesalahan ambil data profil:", error);
+    }
+  }
+
+  async function handleSignIn() {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Perhatian", "Semua kolom wajib diisi!");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Format Email Salah", "Silakan masukkan alamat email yang valid!");
+      return false;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Password Salah", "Password harus memiliki minimal 6 karakter!");
+      return false;
+    }
+
+    try {
+      setLoading(true)
+
+      const hashedPassword = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        password 
+      );
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: hashedPassword,
+      });
+
+      if (error) {
+        Alert.alert("Gagal Masuk", error.message);
+        return;
+      }
+
+      if (data.session) {
+        await fetchUserProfile()
+        Alert.alert("Berhasil", "Selamat datang kembali!");
+        router.replace("/home"); 
+      }
+      
+    } catch (error) {
+      console.error("Terjadi kesalahan:", error)
+      Alert.alert("Gagal!", "Terjadi kesalahan pada server!");
+    } finally {
+      setLoading(false)
+    }
+  }
   
   return (
     <View style={styles.container}>
@@ -20,12 +112,12 @@ export default function SignIn() {
 
       <View style={[styles.card, styles.inputBar]}>
         <Ionicons name="person-outline" size={24} color={Colors.primary} style={styles.icon}/>
-        <TextInput style={styles.textInput} placeholderTextColor={Colors.muted} placeholder="Email" autoCapitalize="none"/>
+        <TextInput value={email} onChangeText={(value) => setEmail(value)} style={styles.textInput} placeholderTextColor={Colors.muted} placeholder="Email" keyboardType="email-address" autoCapitalize="none"/>
       </View>
 
       <View style={[styles.card, styles.inputBar, {marginTop: 12}]}>
         <Ionicons name="lock-closed-outline" size={24} color={Colors.primary} style={styles.icon}/>
-        <TextInput style={styles.textInput} placeholderTextColor={Colors.muted} placeholder="Password" autoCapitalize="none" secureTextEntry={isSecured}/>
+        <TextInput value={password} onChangeText={(value) => setPassword(value)} style={styles.textInput} placeholderTextColor={Colors.muted} placeholder="Password" autoCapitalize="none" secureTextEntry={isSecured}/>
         <TouchableOpacity onPress={() => setIsSecured(!isSecured)}>
           <Ionicons name={isSecured ? "eye-outline" : "eye-off-outline"} size={24} color={Colors.muted} style={styles.icon}/>
         </TouchableOpacity>
@@ -33,19 +125,17 @@ export default function SignIn() {
 
       <TouchableOpacity
         style={[styles.buttonSubmit, {
-          backgroundColor: Colors.primary
-              // backgroundColor: !loading ? Colors.primary : Colors.muted,
+              backgroundColor: !loading ? Colors.primary : Colors.muted,
         }]}
-        // onPress={handleSearchRecipe}
-        // disabled={loading}
+        onPress={handleSignIn}
+        disabled={loading}
       >
-        {/* {loading && (
+        {loading && (
           <ActivityIndicator size="small" color="#fff" style={{ marginRight: 8,}} />
-        )} */}
+        )}
         
         <ThemeText size="base" type="title" style={{ color: "#FFFFFF",}}>
-          {/* {loading ? "Mencari Resep..." : "Cari Resep"} */}
-          Masuk
+          {loading ? "Sedang Masuk..." : "Masuk"}
         </ThemeText>
       </TouchableOpacity>
 
