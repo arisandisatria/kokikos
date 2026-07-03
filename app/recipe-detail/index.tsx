@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/theme";
 import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { BackHandler, Image, Platform, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -74,9 +74,12 @@ export default function index() {
     },
   ]
 
+  const {recipeDetailParams} = useLocalSearchParams()
+  console.log(recipeDetailParams)
+
   useEffect(() => {
       const handleBackPress = () => {
-        router.replace("/recipe-result");
+        router.back();
         return true;
       };
   
@@ -163,7 +166,7 @@ export default function index() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.push("/recipe-result")}
+          onPress={() => router.back()}
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={32} color="black" />

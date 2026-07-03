@@ -32,7 +32,7 @@ export default function Home() {
     return null;
   }
 
-  const { userDetail } = context;
+  const { userDetail, setUserDetail } = context;
 
   function handleAddIngredient() {
     if (ingredient.trim() === "") {
@@ -91,12 +91,13 @@ export default function Home() {
 
       if (existingRecipe && existingRecipe.length > 0) {
         setLoading(false)
-         router.push({
-                pathname: "/recipe-result",
-                params: {
-                  recipesParams: JSON.stringify(existingRecipe[0]),
-                },
-              })
+        const savedRecipesString = existingRecipe[0].ingredients_and_tools;
+        router.push({
+            pathname: "/recipe-result",
+            params: {
+              recipesParams: savedRecipesString,
+            },
+          })
         return
       }
 
@@ -109,36 +110,49 @@ export default function Home() {
         return;
       }
 
-      const cleanedJsonString = result.replace(/```json/gi, "").replace(/```/gi, "").trim();
-    const parsedResult = JSON.parse(cleanedJsonString);
+      const firstBracket = result.indexOf("{");
+      const lastBracket = result.lastIndexOf("}");
 
-    const recipeData = parsedResult.recipe && Array.isArray(parsedResult.recipe)
-      ? parsedResult.recipe[0]
-      : parsedResult;
+      if (firstBracket === -1 || lastBracket === -1) {
+        Alert.alert("Gagal!", "Format resep dari AI tidak valid.");
+        return;
+      }
+
+      // const cleanedJsonString = result.replace(/```json/gi, "").replace(/```/gi, "").trim();
+      const cleanedJsonString = result.substring(firstBracket, lastBracket + 1);
+      const parsedResult = JSON.parse(cleanedJsonString);
+
+      const recipeList = parsedResult.recipe || [];
+
+      if (recipeList.length === 0) {
+        Alert.alert("Gagal!", "Format resep AI tidak sesuai.");
+        return;
+      }
 
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session?.user?.id) {
-        Alert.alert("Gagal!", "Sesi pengguna tidak ditemukan. Silakan login ulang.");
+        Alert.alert("Gagal!", "Sesi pengguna tidak ditemukan. Silakan login ulang!");
+        setUserDetail(null)
+        router.replace("/auth/SignIn")
         return;
-    }
-      const firstRecipe = parsedResult.recipe?.[0] || parsedResult;
-
-      const { error: insertDataError } = await supabase.from("recipes").insert([
-      {
-        user_id: session.user.id,
-        recipe_name: recipeData.recipe_name || "Resep Tanpa Nama",
-        description: recipeData.description || "",
-        estimated_time: recipeData.estimated_time || "",
-        budget: recipeData.budget || "",
-        ingredient_match: recipeData.ingredient_match || "",
-        ingredient_shortage: recipeData.ingredient_shortage || "",
-        ingredients_and_tools: recipeData.ingredients_and_tools ? JSON.stringify(recipeData.ingredients_and_tools) : "",
-        steps: recipeData.steps ? JSON.stringify(recipeData.steps) : "",
-        nutrition: recipeData.nutrition ? JSON.stringify(recipeData.nutrition) : "",
-        search_keywords: searchExistingRecipe
       }
-    ]);
+
+        const { error: insertDataError } = await supabase.from("recipes").insert([
+        {
+          user_id: session.user.id,
+          recipe_name: recipeList[0]?.recipe_name || "Resep Tanpa Nama",
+          description: recipeList[0]?.description || "",
+          estimated_time: recipeList[0]?.estimated_time || "",
+          budget: recipeList[0]?.budget || "",
+          ingredient_match: recipeList[0]?.ingredient_match || "",
+          ingredient_shortage: recipeList[0]?.ingredient_shortage || "",
+          ingredients_and_tools: recipeList.ingredients_and_tools ? JSON.stringify(recipeList.ingredients_and_tools) : "",
+          steps: recipeList.steps ? JSON.stringify(recipeList.steps) : "",
+          nutrition: recipeList.nutrition ? JSON.stringify(recipeList.nutrition) : "",
+          search_keywords: searchExistingRecipe
+        }
+      ]);
 
       if (insertDataError) {
         console.error("Supabase Insert Error:", insertDataError);
@@ -149,12 +163,14 @@ export default function Home() {
       setIngredient("")
       setIngredientsList([])
       router.push({
-            pathname: "/recipe-result",
-            params: {
-              recipesParams: JSON.stringify(firstRecipe), 
-            },
+        pathname: "/recipe-result",
+        params: {
+          recipesParams: JSON.stringify(recipeList), 
+        },
       });
     } catch (error) {
+      setIngredient("")
+      setIngredientsList([])
       console.error("Gemini Error:", error);
       Alert.alert("Gagal!", `Ada kesalahan dari AI atau server!`);
     } finally {
@@ -227,6 +243,8 @@ export default function Home() {
                   placeholderTextColor={Colors.muted}
                   placeholder="2 potong"
                   value={item.quantity}
+                  editable={loading ? false : true}
+                  selectTextOnFocus={loading ? false : true}
                   onChangeText={(text) =>
                     handleUpdateIngredientQuantity(text, item.id)
                   }
@@ -317,7 +335,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   emptyContainer: {
-    marginTop: 54,
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },

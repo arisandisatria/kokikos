@@ -4,7 +4,7 @@ import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { BackHandler, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { BackHandler, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function RecipeResult() {
   const router = useRouter();
@@ -13,15 +13,15 @@ export default function RecipeResult() {
   
   if (!recipesParams) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0f172a" }}>
-        <Text style={{ color: "#fff" }}>Resep tidak ditemukan.</Text>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: Colors.background }}>
+       <Ionicons name="help-outline" size={40} color={Colors.secondary} />
+        <ThemeText type="title" size="lg" style={{color: Colors.primary}}>Resep tidak ditemukan</ThemeText>
       </View>
     );
   }
 
-  const {recipe_name, description, banner_image, estimated_time, budget, ingredient_match, ingredient_shortage, ingredients_and_tools} = JSON.parse(recipesParams as string)
+  const rawRecipes: any[] = JSON.parse(recipesParams as string);
 
-  
   const filters = [
     { id: "cocok", label: "Paling Cocok" },
     { id: "murah", label: "Termurah" },
@@ -30,7 +30,7 @@ export default function RecipeResult() {
 
   useEffect(() => {
     const handleBackPress = () => {
-      router.replace("/home");
+      router.back();
       return true;
     };
 
@@ -45,12 +45,24 @@ export default function RecipeResult() {
 
   }, []);
 
+  const getFilteredRecipes = () => {
+    const recipesCopy = [...rawRecipes];
+    if (selectedFilter === "murah") {
+      return recipesCopy.sort((a, b) => Number(a.budget) - Number(b.budget));
+    } else if (selectedFilter === "cepat") {
+      return recipesCopy.sort((a, b) => Number(a.estimated_time) - Number(b.estimated_time));
+    } else {
+      return recipesCopy.sort((a, b) => Number(b.ingredient_match) - Number(a.ingredient_match));
+    }
+  };
+
+  const displayedRecipes = getFilteredRecipes();
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.push("/home")}
+          onPress={() => router.back()}
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={32} color="black" />
@@ -88,14 +100,26 @@ export default function RecipeResult() {
         })}
       </View>
 
-      <RecipeResultCard
-        recipe_name={recipe_name}
-        estimated_time={estimated_time}
-        budget={budget}
-        ingredient_match={ingredient_match}
-        ingredient_shortage={ingredient_shortage}
-        onPress={() => router.push("/recipe-detail")}
-      />
+      <ScrollView 
+        style={{ flex: 1, marginTop: 12 }} 
+        showsVerticalScrollIndicator={false}
+      >
+        {displayedRecipes.map((recipe, index) => (
+          <View key={index} style={{ marginBottom: 10 }}>
+            <RecipeResultCard
+              recipe_name={recipe.recipe_name}
+              estimated_time={recipe.estimated_time}
+              budget={recipe.budget}
+              ingredient_match={recipe.ingredient_match}
+              ingredient_shortage={recipe.ingredient_shortage}
+              onPress={() => router.push({
+                pathname: "/recipe-detail",
+                params: { recipeDetailParams: JSON.stringify(recipe) }
+              })}
+            />
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -104,7 +128,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 16,
-   marginTop: StatusBar.currentHeight || 40,
+    marginTop: StatusBar.currentHeight || 40,
   },
   header: {
     position: "relative",

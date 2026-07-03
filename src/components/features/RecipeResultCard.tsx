@@ -21,7 +21,7 @@ function RecipeResultCard({
       />
 
       <View style={styles.contentContainer} >
-        <ThemeText size="sm">{recipe_name}</ThemeText>
+        <ThemeText type="subtitle" size="sm" style={{width: "75%"}}>{recipe_name}</ThemeText>
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
@@ -41,13 +41,13 @@ function RecipeResultCard({
           </View>
         </View>
 
-        <ThemeText size="xsm" style={styles.missingIngredients}>
+        <ThemeText size="xsm" style={{marginTop: 6,}}>
           Kurang: {ingredient_shortage}
         </ThemeText>
       </View>
 
       <View style={styles.badgeContainer}>
-        <ThemeText type="subtitle" size="xsm" style={styles.badgeText}>
+        <ThemeText type="subtitle" size="xsm" style={{color: "#FFFFFF",}}>
           {ingredient_match}%
         </ThemeText>
       </View>
@@ -57,11 +57,11 @@ function RecipeResultCard({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    marginTop: 20,
-    minHeight: 80,
+    position: 'relative',
+    height: 140,
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     borderRadius: 24,
     backgroundColor: "#FFFFFF",
     
@@ -84,12 +84,12 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
   },
   contentContainer: {
-    width: "50%",
-    paddingVertical: 16,
+    width: "65%",
+    paddingVertical: 8,
     paddingLeft: 8,
   },
   infoRow: {
-    marginTop: 4,
+    marginTop: 6,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -105,12 +105,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.muted || "#9CA3AF",
     marginVertical: 6,
   },
-  missingIngredients: {
-    marginTop: 4,
-  },
   badgeContainer: {
-    marginRight: 16,
-    marginTop: 16,
+    position: "absolute",
+    right: 15,
+    top: 15,
     height: 28,
     alignItems: "center",
     justifyContent: "center",
@@ -118,9 +116,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#22c55e",
     paddingHorizontal: 8,
     paddingVertical: 4,
-  },
-  badgeText: {
-    color: "#FFFFFF",
   },
 });
 

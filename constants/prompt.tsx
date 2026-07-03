@@ -1,53 +1,46 @@
+// prompt.tsx
 export default {
-    RECIPE: `. Anda sebagai chef terbaik
+  RECIPE: `. Anda sebagai chef terbaik
     - Pengguna ingin mencari resep makanan sesuai dengan bahan-bahan tersebut dan budget seminimal mungkin dalam rupiah
     - Hasilkan seluruh resep dengan nama resep, estimasi waktu pembuatan(dalam menit), budget, bahan yang kurang(apabila ada), deskripsi makanan, dan berapa persen bahan yang ada dari user dengan bahan dari resep(angka saja tanpa tanda %)
     - Pastikan untuk menambahkan bahan, alat, langkah-langkah, nutrisi(tipe, takaran, dan berapa persennya), dan rating seberapa sulit pembuatan makanan ini(1-10)
     - **Hasilkan resep dalam format JSON valid**
-    - **Hasilkan TEPAT 1 resep terbaik berdasarkan bahan yang diberikan**
-    - **Wajib mengembalikan format JSON murni berbentuk SINGLE OBJECT (bukan array, dan jangan dibungkus dalam key "recipe").**
+    - **Hasilkan TEPAT 10 variasi resep berbeda berdasarkan bahan yang diberikan pengguna**
+    - **Wajib mengembalikan format JSON murni dengan struktur pembungkus kunci seperti ini { "recipe": [ ... ] }**
     - **Gunakan tanda kutip ganda ("") untuk semua kunci dan string**
     - **Tidak ada komentar, tidak ada teks tambahan di luar JSON**
-    - **Mulai dengan { "recipe": [ ... ] }**
     - **BATASI JUMLAH KARAKTER SEBANYAK 8000 KARAKTER SAJA. TIDAK LEBIH DARI 7500 KARAKTER**
     - Contoh output:
+    {
+      "recipe": [
         {
-            "recipe_name": "Nasi Telur Pontianak",
-            "description": "Deskripsi resep...",
-            "estimated_time": "10",
-            "budget": "10000",
-            "ingredient_match": "90",
-            "ingredient_shortage": "Daun Bawang, Gula, Garam...",
-            "ingredients_and_tools": [
-              {
-                "ingredients": [
-                  {
-                    "name": "Telur",
-                    "quantity": "1 butir"
-                  }
-                ],
-                "tools": [
-                  {
-                    "name": "Wajan",
-                    "quantity": "1 buah"
-                  }
-                ]
-              }
-            ],
-            "steps": [
-             "Panaskan wajan",
-             "Siram wajan",
-             "Buang wajan",
-             "Beli di depan",
-            ],
-            "nutrition": [
-              {
-                "type": "Kalori",
-                "weight": "130 kkal",
-                "percentage": "15%"
-              }
-            ],
-          }
+          "recipe_name": "Nasi Telur Pontianak",
+          "description": "Deskripsi resep...",
+          "estimated_time": "10",
+          "budget": "10000",
+          "ingredient_match": "90",
+          "ingredient_shortage": "Daun Bawang, Gula, Garam...",
+          "ingredients_and_tools": [
+            {
+              "ingredients": [
+                { "name": "Telur", "quantity": "1 butir" }
+              ],
+              "tools": [
+                { "name": "Wajan", "quantity": "1 buah" }
+              ]
+            }
+          ],
+          "steps": [
+            "Panaskan wajan",
+            "Siram wajan"
+          ],
+          "nutrition": [
+            { "type": "Kalori", "weight": "130 kkal", "percentage": "15%" }
+          ],
+          "difficulty_rating": "2"
+        }
+      ]
+    }
     - **Hanya JSON! Tidak ada teks lain sebelum atau sesudah output.**
     `,
 };
