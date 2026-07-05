@@ -5,7 +5,7 @@ import { supabase } from "@/utils/supabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { BackHandler, Dimensions, Image, Platform, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, BackHandler, Dimensions, Image, Platform, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const { width: screenWidth } = Dimensions.get("window");
 const CARD_WIDTH = (screenWidth - 32 - 39) / 4;
@@ -91,6 +91,19 @@ export default function index() {
 
   async function checkIfRecipeBookmarked() {
     if (!id) return;
+
+    const previousBookmarkState = isBookmarked;
+
+    setIsBookmarked(!isBookmarked);
+
+    try {
+      
+    } catch (error) {
+      console.error("Terjadi kesalahan jaringan/database:", error);
+      setIsBookmarked(previousBookmarkState);
+      Alert.alert("Koneksi Gagal", "Gagal menyimpan resep, coba lagi nanti.");
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
 
     if (!session?.user?.id) return;
