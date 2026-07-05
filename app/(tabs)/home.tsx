@@ -91,11 +91,10 @@ export default function Home() {
 
       if (existingRecipe && existingRecipe.length > 0) {
         setLoading(false)
-        const savedRecipesString = existingRecipe[0].ingredients_and_tools;
         router.push({
             pathname: "/recipe-result",
             params: {
-              recipesParams: savedRecipesString,
+              recipesParams: JSON.stringify(existingRecipe),
             },
           })
         return
@@ -118,7 +117,6 @@ export default function Home() {
         return;
       }
 
-      // const cleanedJsonString = result.replace(/```json/gi, "").replace(/```/gi, "").trim();
       const cleanedJsonString = result.substring(firstBracket, lastBracket + 1);
       const parsedResult = JSON.parse(cleanedJsonString);
 
@@ -138,25 +136,25 @@ export default function Home() {
         return;
       }
 
-        const { error: insertDataError } = await supabase.from("recipes").insert([
-        {
-          user_id: session.user.id,
-          recipe_name: recipeList[0]?.recipe_name || "Resep Tanpa Nama",
-          description: recipeList[0]?.description || "",
-          estimated_time: recipeList[0]?.estimated_time || "",
-          budget: recipeList[0]?.budget || "",
-          ingredient_match: recipeList[0]?.ingredient_match || "",
-          ingredient_shortage: recipeList[0]?.ingredient_shortage || "",
-          ingredients_and_tools: recipeList.ingredients_and_tools ? JSON.stringify(recipeList.ingredients_and_tools) : "",
-          steps: recipeList.steps ? JSON.stringify(recipeList.steps) : "",
-          nutrition: recipeList.nutrition ? JSON.stringify(recipeList.nutrition) : "",
-          search_keywords: searchExistingRecipe
-        }
-      ]);
+      const recipesToInsert = recipeList.map((item: any) => ({
+        user_id: session.user.id,
+        recipe_name: item?.recipe_name || "Resep Tanpa Nama",
+        description: item?.description || "",
+        estimated_time: item?.estimated_time || 0,
+        budget: item?.budget || 0,
+        ingredient_match: item?.ingredient_match || 0,
+        ingredient_shortage: item?.ingredient_shortage || 0,
+        ingredients_and_tools: item?.ingredients_and_tools ? JSON.stringify(item.ingredients_and_tools) : "[]",
+        steps: item?.steps ? JSON.stringify(item.steps) : "[]",
+        nutrition: item?.nutrition ? JSON.stringify(item.nutrition) : "[]",
+        search_keywords: searchExistingRecipe
+      }));
+
+      const { data: insertedData, error: insertDataError } = await supabase.from("recipes").insert(recipesToInsert).select();
 
       if (insertDataError) {
         console.error("Supabase Insert Error:", insertDataError);
-        Alert.alert("Gagal!", `Gagal menyimpan error!`);
+        Alert.alert("Gagal!", `Gagal menyimpan daftar resep ke database!`);
         return
       }
 
@@ -165,7 +163,7 @@ export default function Home() {
       router.push({
         pathname: "/recipe-result",
         params: {
-          recipesParams: JSON.stringify(recipeList), 
+          recipesParams: JSON.stringify(insertedData), 
         },
       });
     } catch (error) {
@@ -206,8 +204,10 @@ export default function Home() {
                     ingredient === '' ? styles.textInput : styles.textInput
                   ]}
             placeholderTextColor={Colors.muted}
-            placeholder="telur, sawi, tempe..."
+            placeholder="Isi bahan satu per satu disini..."
             value={ingredient}
+            editable={loading ? false : true}
+            selectTextOnFocus={loading ? false : true}
             onChangeText={setIngredient}
             onSubmitEditing={handleAddIngredient}
           />
@@ -225,7 +225,7 @@ export default function Home() {
             <View style={styles.emptyContainer}>
               <Ionicons name="basket-outline" size={40} color={Colors.muted} />
               <ThemeText size="sm" type="caption" style={{ textAlign: "center",}}>
-                Keranjang masih kosong nih
+                Bahan belum dimasukkan
               </ThemeText>
             </View>
           ) : (
@@ -241,7 +241,7 @@ export default function Home() {
                 <TextInput
                   style={styles.quantityInput}
                   placeholderTextColor={Colors.muted}
-                  placeholder="2 potong"
+                  placeholder="Isi jumlah bahan"
                   value={item.quantity}
                   editable={loading ? false : true}
                   selectTextOnFocus={loading ? false : true}
@@ -350,11 +350,11 @@ const styles = StyleSheet.create({
     color: Colors.body,
   },
   quantityInput: {
-    width: "30%",
+    width: "45%",
     borderBottomWidth: 1,
     borderBottomColor: Colors.body,
     paddingVertical: 0,
-    fontSize: 12,
+    fontSize: 10,
     color: Colors.body,
     fontFamily: "os-regular"
   },

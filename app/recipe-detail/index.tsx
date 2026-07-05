@@ -1,13 +1,19 @@
 import { Colors } from "@/constants/theme";
 import ThemeText from "@/src/components/ui/ThemeText";
+import { IngredientsAndToolsItem, NutritionItem, RecipeDetail } from "@/src/types";
+import { supabase } from "@/utils/supabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { BackHandler, Image, Platform, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
+import { BackHandler, Dimensions, Image, Platform, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
+
+const { width: screenWidth } = Dimensions.get("window");
+const CARD_WIDTH = (screenWidth - 32 - 39) / 4;
 
 export default function index() {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState("bahan-alat");
+  const [isBookmarked, setIsBookmarked] = useState(false)
 
   const tabs = [
     {
@@ -23,7 +29,7 @@ export default function index() {
       label: "Nutrisi",
     },
   ];
-  const mockIngredients = [{ingredient: "Telur", quantity: "1 butir"}, {ingredient: "Ikan", quantity: "2 ekor"}, {ingredient: "Nasi", quantity: "1 bakul"}, {ingredient: "Bawang Putih", quantity: "1 siung"}, {ingredient: "Jahe", quantity: "1 buah"}]
+  const mockIngredients = [{name: "Telur", quantity: "1 butir"}, {name: "Ikan", quantity: "2 ekor"}, {name: "Nasi", quantity: "1 bakul"}, {name: "Bawang Putih", quantity: "1 siung"}, {name: "Jahe", quantity: "1 buah"}]
   const mockTools = ["Wajan", "Spatula", "Sendok", "Piring", "Pisau"]
   const mockSteps = ["Panaskan wajan", "Siram wajan", "Buang wajan", 'Beli di depan']
   const mockNutrition= [
@@ -53,29 +59,97 @@ export default function index() {
       percentage: "80%"
     },
     {
-      type: "Protein",
-      weight: "7 gram",
-      percentage: "5%"
-    },
-    {
-      type: "Kalori",
-      weight: "130 kkal",
-      percentage: "15%"
-    },
-    {
       type: "Karbo",
       weight: "20 gram",
       percentage: "80%"
     },
-    {
-      type: "Protein",
-      weight: "7 gram",
-      percentage: "5%"
-    },
   ]
 
   const {recipeDetailParams} = useLocalSearchParams()
-  console.log(recipeDetailParams)
+
+  const recipeParamsString = Array.isArray(recipeDetailParams) 
+  ? recipeDetailParams[0] 
+  : recipeDetailParams;
+
+  const {id, recipe_name, description, estimated_time, budget, ingredients_and_tools, steps, nutrition, difficulty_rating}: RecipeDetail = JSON.parse(recipeParamsString || "{}")
+
+  const nutritionData: NutritionItem[] = typeof nutrition === 'string' 
+  ? JSON.parse(nutrition || "[]") 
+  : nutrition;
+
+  const itemsData: IngredientsAndToolsItem[] = typeof ingredients_and_tools === "string"
+  ? JSON.parse(ingredients_and_tools || "[]")
+  : ingredients_and_tools;
+
+  const stepsData: string[] = typeof steps === 'string' 
+  ? JSON.parse(steps || "[]") 
+  : steps;
+
+  const currentIngredients = itemsData?.[0]?.ingredients || [];
+  const currentTools = itemsData?.[0]?.tools || [];
+  const recipeSteps = Array.isArray(stepsData) ? stepsData : [];
+
+  async function checkIfRecipeBookmarked() {
+    if (!id) return;
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.user?.id) return;
+
+    const {data, error: isError} = await supabase.from("profiles").select("bookmarked").eq("id", session.user.id).single()
+
+    if (isError) {
+      console.error("Gagal mengambil data bookmark:", isError);
+      return;
+    }
+
+    const bookmarkedArray: string[] = data?.bookmarked || []
+
+    const isExist = bookmarkedArray.includes(id)
+
+    setIsBookmarked(isExist)
+  }
+
+  async function handleToogleBookmarkRecipe() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return;
+
+      const { data, error: fetchError } = await supabase
+        .from("profiles")
+        .select("bookmarked")
+        .eq("id", session.user.id)
+        .single();
+      
+      if (fetchError) {
+        console.error("Gagal sinkronisasi data sebelum toggle:", fetchError);
+        return;
+      }
+
+      let currentBookmarks: string[] = data?.bookmarked || []
+      let updatedBookmarks: string[] = []
+
+      if (isBookmarked) {
+        updatedBookmarks = currentBookmarks.filter(item => item !== id)
+      } else {
+        if (!currentBookmarks.includes(id)) {
+          updatedBookmarks = [...currentBookmarks, id];
+        } else {
+          updatedBookmarks = currentBookmarks;
+        }
+      }
+
+      const {error: updateError} = await supabase.from("profiles").update({bookmarked: updatedBookmarks}).eq("id", session.user.id)
+
+      if (updateError) {
+        console.error("Gagal update data:", updateError);
+        return;
+      }
+
+      setIsBookmarked(!isBookmarked)      
+    } catch (error) {
+      console.error("Terjadi kesalahan:", error)
+    }
+  }
 
   useEffect(() => {
       const handleBackPress = () => {
@@ -87,12 +161,14 @@ export default function index() {
         "hardwareBackPress",
         handleBackPress,
       );
+
+      checkIfRecipeBookmarked()
   
       return () => {
         backHandler.remove();
-      };
+      }; 
   
-    }, []);
+    }, [id]);
 
   let content;
 
@@ -103,10 +179,11 @@ export default function index() {
         <ThemeText type="title" style={{ marginBottom: 8 }}>
             Langkah:
           </ThemeText>
-          {mockSteps.map((step, index) => (
-            <View key={index} style={styles.listItem}>
+          {recipeSteps.map((step, index) => (
+            <View key={index} style={[styles.listItem, {alignItems: "flex-start"}]}>
+              <ThemeText type="subtitle" size="sm">{index + 1}.{" "}</ThemeText>
               <ThemeText style={styles.listItemText} type="subtitle" size="sm">
-                {index + 1}. {step}
+                {step}
               </ThemeText>
             </View>
           ))}
@@ -116,7 +193,7 @@ export default function index() {
       content = 
       <View style={styles.nutritionContainer}>
         {
-          mockNutrition.map((item, index) => (
+          nutritionData && nutritionData.map((item, index) => (
             <View key={index} style={styles.nutritionCard}>
               <ThemeText size="sm" type="subtitle">{item.type}</ThemeText>
               <ThemeText size="xsm" type="caption">{item.weight}</ThemeText>
@@ -135,14 +212,14 @@ export default function index() {
         <ThemeText type="title" style={{ marginBottom: 8 }}>
             Bahan:
           </ThemeText>
-          {mockIngredients.map((item, index) => (
+          {currentIngredients.map((ingredient, index) => (
             <View  key={index} style={styles.listItem}>
               <ThemeText style={styles.bullet}>{"\u2022"}</ThemeText>
               <ThemeText style={styles.listItemText} type="subtitle" size="sm">
-                {item.ingredient}
+                {ingredient.name}
               </ThemeText>
-              <ThemeText type="subtitle" size="sm">
-                {item.quantity}
+              <ThemeText type="subtitle" size="sm" style={{marginRight: 10}}>
+                {ingredient.quantity}
               </ThemeText>
             </View>
           ))}
@@ -150,11 +227,14 @@ export default function index() {
           <ThemeText type="title" style={{ marginTop: 12, marginBottom: 8 }}>
             Alat:
           </ThemeText>
-          {mockTools.map((tool, index) => (
+          {currentTools.map((tool, index) => (
             <View key={index} style={styles.listItem}>
               <ThemeText style={styles.bullet}>{"\u2022"}</ThemeText>
               <ThemeText style={styles.listItemText} type="subtitle" size="sm">
-                {tool}
+                {tool.name}
+              </ThemeText>
+               <ThemeText type="subtitle" size="sm" style={{marginRight: 10}}>
+                {tool.quantity}
               </ThemeText>
             </View>
           ))}
@@ -167,34 +247,34 @@ export default function index() {
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={32} color="black" />
         </TouchableOpacity>
         <ThemeText type="title" size="lg">Detail Pencarian</ThemeText>
+        <TouchableOpacity onPress={handleToogleBookmarkRecipe} activeOpacity={0.5}>
+          <Ionicons name={isBookmarked ? "bookmark-sharp" : "bookmark-outline"} size={32} color={Colors.primary} />
+        </TouchableOpacity>
       </View>
 
         <View style={styles.imageContainer}>
           <Image source={require("../../assets/images/placeholder.png")} />
           <ThemeText type="title" size="lg" style={{ marginTop: 32 }}>
-            Nasi Telur Pontianak
+            {recipe_name}
           </ThemeText>
         </View>
 
         <ThemeText size="sm" style={styles.description}>
-          Nasi Telur Pontianak adalah hidangan nasi hangat dengan telur ceplok
-          yang disiram saus kecap manis-asin gurih, seringkali dengan aroma ebi
-          dan bawang putih.
+          {description}
         </ThemeText>
 
         <View style={styles.infoContainer}>
           <View style={styles.infoItem}>
             <Ionicons name="time-outline" size={17} color={Colors.secondary} />
-            <ThemeText size="sm">10 menit</ThemeText>
+            <ThemeText size="sm">{estimated_time} menit</ThemeText>
           </View>
           <View style={styles.infoItem}>
-            <Ionicons name="star-outline" size={17} color={Colors.secondary} />
-            <ThemeText size="sm">4.5</ThemeText>
+            <Ionicons name="speedometer-outline" size={17} color={Colors.secondary} />
+            <ThemeText size="sm">{difficulty_rating}/10</ThemeText>
           </View>
         </View>
 
@@ -250,12 +330,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-  },
-  backButton: {
-    position: "absolute",
-    left: 0,
-    zIndex: 10,
+    justifyContent: "space-between",
   },
   imageContainer: {
     width: "100%",
@@ -321,10 +396,10 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between", 
-    rowGap: 20,
+    gap: 10,
   },
   nutritionCard: {
+    width: CARD_WIDTH + 10,
     backgroundColor: "#fff",
     padding: 12,
     alignItems: "center",

@@ -30,3 +30,36 @@ export interface UserProfile {
   email: string;
   phone_number?: string;
 }
+
+export interface NutritionItem {
+  type: string;
+  weight: string;
+  percentage: string;
+}
+
+export interface RecipeDetail {
+  id: string;
+  recipe_name: string;
+  description: string;
+  estimated_time: string;
+  budget: string;
+  ingredients_and_tools: IngredientsAndToolsItem[];
+  steps: string[];
+  nutrition: NutritionItem;
+  difficulty_rating: string;
+}
+
+export interface Ingredient {
+  name: string;
+  quantity: string;
+}
+
+export interface Tool {
+  name: string;
+  quantity: string;
+}
+
+export interface IngredientsAndToolsItem {
+  ingredients: Ingredient[];
+  tools: Tool[];
+}

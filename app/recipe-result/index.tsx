@@ -14,8 +14,16 @@ export default function RecipeResult() {
   if (!recipesParams) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: Colors.background }}>
-       <Ionicons name="help-outline" size={40} color={Colors.secondary} />
-        <ThemeText type="title" size="lg" style={{color: Colors.primary}}>Resep tidak ditemukan</ThemeText>
+        <Ionicons name="help-outline" size={150} color={Colors.secondary} />
+        <ThemeText type="caption" size="lg" style={{color: Colors.body}}>Resep tidak ditemukan</ThemeText>
+        <TouchableOpacity
+          style={styles.buttonSubmit}
+          onPress={() => router.replace("/home")}
+        >                    
+          <ThemeText size="base" type="title" style={{ color: "#FFFFFF",}}>
+            Kembali
+          </ThemeText>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -129,6 +137,17 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 16,
     marginTop: StatusBar.currentHeight || 40,
+  },
+  buttonSubmit: {
+    alignSelf: "stretch",
+    backgroundColor: Colors.primary,
+    marginHorizontal: 40,
+    marginTop: 20,
+    borderRadius: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   header: {
     position: "relative",

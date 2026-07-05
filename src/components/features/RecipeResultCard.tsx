@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-around",
-    borderRadius: 24,
+    borderRadius: 26,
     backgroundColor: "#FFFFFF",
     
     // --- KHUSUS IOS ---
