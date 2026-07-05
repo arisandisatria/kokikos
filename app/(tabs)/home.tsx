@@ -144,6 +144,7 @@ export default function Home() {
         budget: item?.budget || 0,
         ingredient_match: item?.ingredient_match || 0,
         ingredient_shortage: item?.ingredient_shortage || 0,
+        difficulty_rating: item?.difficulty_rating || 0,
         ingredients_and_tools: item?.ingredients_and_tools ? JSON.stringify(item.ingredients_and_tools) : "[]",
         steps: item?.steps ? JSON.stringify(item.steps) : "[]",
         nutrition: item?.nutrition ? JSON.stringify(item.nutrition) : "[]",
