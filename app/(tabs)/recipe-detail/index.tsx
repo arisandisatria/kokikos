@@ -212,7 +212,7 @@ export default function index() {
               <ThemeText size="xsm" type="caption">{item.weight}</ThemeText>
 
               <View style={styles.circleBadge}>
-                <ThemeText style={styles.circleText} type="subtitle">{item.percentage}</ThemeText>
+                <ThemeText style={styles.circleText} type="subtitle">{item.percentage}%</ThemeText>
               </View>
             </View>
         ))
@@ -270,7 +270,7 @@ export default function index() {
       </View>
 
         <View style={styles.imageContainer}>
-          <Image source={require("../../assets/images/placeholder.png")} />
+          <Image source={require("../../../assets/images/placeholder.png")} />
           <ThemeText type="title" size="lg" style={{ marginTop: 32 }}>
             {recipe_name}
           </ThemeText>
@@ -335,7 +335,6 @@ export default function index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 16,
     marginTop: StatusBar.currentHeight || 40,
   },
   header: {

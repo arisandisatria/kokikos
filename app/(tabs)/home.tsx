@@ -174,6 +174,8 @@ export default function Home() {
       console.error("Gemini Error:", error);
       Alert.alert("Gagal!", `Ada kesalahan dari AI atau server!`);
     } finally {
+      setIngredient("")
+      setIngredientsList([])
       setLoading(false)
     }
   }

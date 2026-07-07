@@ -76,6 +76,18 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="recipe-result/index"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="recipe-detail/index"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
