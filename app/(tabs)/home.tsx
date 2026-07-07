@@ -12,6 +12,7 @@ import { useContext, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Platform,
   ScrollView,
   StatusBar,
@@ -188,8 +189,8 @@ export default function Home() {
           </ThemeText>
           !
         </ThemeText>
-        <TouchableOpacity>
-          <Ionicons name="person-circle-outline" size={50} color={Colors.secondary} />
+        <TouchableOpacity onPress={() => router.push("/profile")} activeOpacity={0.8} style={styles.imageContainer}>
+          <Image source={require("../../assets/images/avatar.png")} style={styles.avatar} resizeMode='cover'/>
         </TouchableOpacity>
       </View>
 
@@ -297,6 +298,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  imageContainer: {
+    width: 50,
+    height: 50,
+    alignItems: "center",
+    overflow: "hidden",
+    borderRadius: 75
+  },
+  avatar: {
+  borderRadius: 75,
+  ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 7 },
+        shadowOpacity: 0.05,
+        shadowRadius: 7,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   card: {
     backgroundColor: "#FFFFFF",

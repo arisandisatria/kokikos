@@ -335,6 +335,7 @@ export default function index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginHorizontal: 16,
     marginTop: StatusBar.currentHeight || 40,
   },
   header: {

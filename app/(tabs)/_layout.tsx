@@ -13,7 +13,7 @@ export default function TabLayout() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: "#CDCDE0",
+        tabBarInactiveTintColor: Colors.muted,
         tabBarIconStyle: {
           height: "100%",
           width: "100%",
@@ -61,21 +61,21 @@ export default function TabLayout() {
             </View>
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="profile"
         options={{
           tabBarIcon: ({ color, focused }) => (
             <View className="items-center justify-center">
               <Ionicons
-                name={focused ? "person-circle" : "person-circle-outline"}
+                name={focused ? "person" : "person-outline"}
                 size={28}
                 color={color}
               />
             </View>
           ),
         }}
-      /> */}
+      />
     </Tabs>
   );
 }
