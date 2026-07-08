@@ -2,10 +2,12 @@ import { Colors } from '@/constants/theme';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import ThemeText from '@/src/components/ui/ThemeText';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 import { useContext, useState } from 'react';
 import { Image, Modal, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function index() {
+  const router = useRouter()
   const [modalVisible, setModalVisible] = useState(false);
   const context = useContext(UserDetailContext);
 
@@ -20,7 +22,7 @@ export default function index() {
       <ThemeText type="title" size="lg" style={styles.header}>Profil Anda</ThemeText>
 
       <View style={styles.imageContainer}>
-        <Image source={require("../../assets/images/avatar.png")} style={styles.avatar} resizeMode='cover'/>
+        <Image source={require("../../../assets/images/avatar.png")} style={styles.avatar} resizeMode='cover'/>
       </View>
 
       <View style={styles.profileInfo}>
@@ -30,13 +32,13 @@ export default function index() {
 
       <View style={styles.itemContainer}>
         <View style={styles.innerItem}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/(tabs)/profile/edit-profile")}>
             <Ionicons name="pencil-outline" size={32} color={Colors.primary} style={styles.itemIcon}/>
           </TouchableOpacity>
           <ThemeText style={{marginTop: 4, textAlign: "center"}} size='sm'>Edit Profile</ThemeText>
         </View>
         <View style={styles.innerItem}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/(tabs)/profile/saved-recipe")}>
             <Ionicons name="bookmark-outline" size={32} color={Colors.primary} style={styles.itemIcon}/>
           </TouchableOpacity>
           <ThemeText style={{marginTop: 4, textAlign: "center"}} size='sm'>Resep Tersimpan</ThemeText>

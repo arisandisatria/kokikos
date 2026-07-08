@@ -270,7 +270,7 @@ export default function index() {
       </View>
 
         <View style={styles.imageContainer}>
-          <Image source={require("../../../assets/images/placeholder.png")} />
+          <Image source={require("../../assets/images/placeholder.png")} />
           <ThemeText type="title" size="lg" style={{ marginTop: 32 }}>
             {recipe_name}
           </ThemeText>

@@ -115,6 +115,7 @@ export default function RecipeResult() {
         {displayedRecipes.map((recipe, index) => (
           <View key={index} style={{ marginBottom: 10 }}>
             <RecipeResultCard
+              isInResultPage
               recipe_name={recipe.recipe_name}
               estimated_time={recipe.estimated_time}
               budget={recipe.budget}
@@ -138,17 +139,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: StatusBar.currentHeight || 40,
   },
-  buttonSubmit: {
-    alignSelf: "stretch",
-    backgroundColor: Colors.primary,
-    marginHorizontal: 40,
-    marginTop: 20,
-    borderRadius: 16,
-    paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   header: {
     position: "relative",
     marginTop: 16,
@@ -160,6 +150,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     zIndex: 10,
+  },
+  buttonSubmit: {
+    alignSelf: "stretch",
+    backgroundColor: Colors.primary,
+    marginHorizontal: 40,
+    marginTop: 20,
+    borderRadius: 16,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   filterContainer: {
     marginTop: 20,

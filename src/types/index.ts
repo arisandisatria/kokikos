@@ -16,6 +16,7 @@ export interface ThemedTextInputProps extends TextProps {
 }
 
 export interface RecipeResultCardProps {
+  isInResultPage: boolean,
   recipe_name: string,
   estimated_time: number,
   budget: number,

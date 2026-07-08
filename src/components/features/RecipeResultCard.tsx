@@ -1,10 +1,11 @@
 import { Colors } from "@/constants/theme";
 import { RecipeResultCardProps } from "@/src/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import ThemeText from "../ui/ThemeText";
 
 function RecipeResultCard({
+  isInResultPage = true,
   recipe_name,
   estimated_time,
   budget,
@@ -13,15 +14,29 @@ function RecipeResultCard({
   onPress
 }: RecipeResultCardProps) {
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={styles.cardContainer}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.9} style={[styles.cardContainer, {
+      height: isInResultPage ? 140 : 180,
+      borderRadius: isInResultPage ? 26 : 16,
+      justifyContent: isInResultPage ? "space-around" : "center",
+      flexDirection: isInResultPage ? "row" : "column",
+    }]}>
       <Image
         source={require("../../../assets/images/placeholder.png")}
-        style={styles.image}
+        style={{
+          width: isInResultPage ? "33.33%" : "50%",
+          height: isInResultPage ? "100%" : "50%",
+          borderBottomLeftRadius: isInResultPage ? 24 : 0,
+          borderTopLeftRadius: isInResultPage ? 24 : 0,
+          marginTop: 8
+        }}
         resizeMode="cover"
       />
 
-      <View style={styles.contentContainer} >
-        <ThemeText type="subtitle" size="sm" style={{width: "75%"}}>{recipe_name}</ThemeText>
+      <View style={[styles.contentContainer, {
+        width: isInResultPage ? "65%" : '100%',
+        paddingLeft: isInResultPage ? 8 : 0,
+      }]} >
+        <ThemeText type="subtitle" size="sm" style={{width: isInResultPage ? "75%" : "100%", textAlign: "center"}}>{recipe_name}</ThemeText>
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
@@ -41,16 +56,23 @@ function RecipeResultCard({
           </View>
         </View>
 
-        <ThemeText size="xsm" style={{marginTop: 6,}}>
-          Kurang: {ingredient_shortage}
-        </ThemeText>
+        {
+          isInResultPage ?
+          <ThemeText size="xsm" style={{marginTop: 6,}}>
+            Kurang: {ingredient_shortage}
+          </ThemeText> : null
+        }
       </View>
 
-      <View style={styles.badgeContainer}>
-        <ThemeText type="subtitle" size="xsm" style={{color: "#FFFFFF",}}>
-          {ingredient_match}%
-        </ThemeText>
-      </View>
+        {
+          isInResultPage ?
+          <View style={styles.badgeContainer}>
+            <ThemeText type="subtitle" size="xsm" style={{color: "#FFFFFF",}}>
+              {ingredient_match}%
+            </ThemeText>
+          </View> : null
+        }
+      
     </TouchableOpacity>
   );
 }
@@ -58,35 +80,25 @@ function RecipeResultCard({
 const styles = StyleSheet.create({
   cardContainer: {
     position: 'relative',
-    height: 140,
+    alignItems: "center",
     width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-around",
     borderRadius: 26,
     backgroundColor: "#FFFFFF",
-    
-    // --- KHUSUS IOS ---
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 7,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 7,
-
-    // --- KHUSUS ANDROID ---
-    elevation: 2,
-  },
-  image: {
-    width: "33.33%",
-    height: "100%",
-    borderBottomLeftRadius: 24,
-    borderTopLeftRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 7 },
+        shadowOpacity: 0.05,
+        shadowRadius: 7,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   contentContainer: {
-    width: "65%",
     paddingVertical: 8,
-    paddingLeft: 8,
+    alignItems: "center",
   },
   infoRow: {
     marginTop: 6,
