@@ -34,6 +34,7 @@ export default function Home() {
   }
 
   const { userDetail, setUserDetail } = context;
+  const firstName = userDetail?.name ? userDetail?.name.trim().split(" ")[0] : "User Keren";
 
   function handleAddIngredient() {
     if (ingredient.trim() === "") {
@@ -187,7 +188,7 @@ export default function Home() {
         <ThemeText type="title" size="lg">
           Halo,{" "}
           <ThemeText type="title" size="lg" style={{color: Colors.primary}}>
-            {userDetail?.name}
+            {firstName}
           </ThemeText>
           !
         </ThemeText>

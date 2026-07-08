@@ -83,13 +83,12 @@ export default function SignIn() {
       });
 
       if (error) {
-        Alert.alert("Gagal Masuk", error.message);
+        Alert.alert("Gagal Masuk:", error.message);
         return;
       }
 
       if (data.session) {
         await fetchUserProfile()
-        Alert.alert("Berhasil", "Selamat datang kembali!");
         router.replace("/home"); 
       }
       

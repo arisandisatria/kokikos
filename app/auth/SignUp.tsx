@@ -113,22 +113,22 @@ export default function SignUp() {
 
       <View style={[styles.card, styles.inputBar]}>
         <Ionicons name="mail-outline" size={24} color={Colors.primary} style={styles.icon}/>
-        <TextInput value={userAccount.fullname} onChangeText={(value) => setUserAccount(prev => ({...prev, fullname: value}))} placeholderTextColor={Colors.muted} placeholder="Nama Lengkap"/>
+        <TextInput style={styles.textInput} value={userAccount.fullname} onChangeText={(value) => setUserAccount(prev => ({...prev, fullname: value}))} placeholderTextColor={Colors.muted} placeholder="Nama Lengkap"/>
       </View>
 
       <View style={[styles.card, styles.inputBar, {marginTop: 12}]}>
         <Ionicons name="person-outline" size={24} color={Colors.primary} style={styles.icon}/>
-        <TextInput value={userAccount.email} keyboardType="email-address" onChangeText={(value) => setUserAccount(prev => ({...prev, email: value}))} placeholderTextColor={Colors.muted} placeholder="Email" autoCapitalize="none"/>
+        <TextInput style={styles.textInput} value={userAccount.email} keyboardType="email-address" onChangeText={(value) => setUserAccount(prev => ({...prev, email: value}))} placeholderTextColor={Colors.muted} placeholder="Email" autoCapitalize="none"/>
       </View>
 
       <View style={[styles.card, styles.inputBar, {marginTop: 12}]}>
         <Ionicons name="call-outline" size={24} color={Colors.primary} style={styles.icon}/>
-        <TextInput value={userAccount.phone_number} onChangeText={(value) => setUserAccount(prev => ({...prev, phone_number: value}))} placeholderTextColor={Colors.muted} placeholder="Nomor Telfon" autoCapitalize="none" keyboardType="phone-pad"/>
+        <TextInput style={styles.textInput} value={userAccount.phone_number} onChangeText={(value) => setUserAccount(prev => ({...prev, phone_number: value}))} placeholderTextColor={Colors.muted} placeholder="Nomor Telfon" autoCapitalize="none" keyboardType="phone-pad"/>
       </View>
 
       <View style={[styles.card, styles.inputBar, {marginTop: 12}]}>
         <Ionicons name="lock-closed-outline" size={24} color={Colors.primary} style={styles.icon}/>
-        <TextInput value={userAccount.password} onChangeText={(value) => setUserAccount(prev => ({...prev, password: value}))} placeholderTextColor={Colors.muted} placeholder="Password" autoCapitalize="none" secureTextEntry={isSecured}/>
+        <TextInput style={styles.textInput} value={userAccount.password} onChangeText={(value) => setUserAccount(prev => ({...prev, password: value}))} placeholderTextColor={Colors.muted} placeholder="Password" autoCapitalize="none" secureTextEntry={isSecured}/>
         <TouchableOpacity onPress={() => setIsSecured(!isSecured)}>
           <Ionicons name={isSecured ? "eye-outline" : "eye-off-outline"} size={24} color={Colors.muted} style={styles.icon}/>
         </TouchableOpacity>
@@ -136,7 +136,7 @@ export default function SignUp() {
 
       <View style={[styles.card, styles.inputBar, {marginTop: 12}]}>
         <Ionicons name="lock-closed-outline" size={24} color={Colors.primary} style={styles.icon}/>
-        <TextInput value={userAccount.confirm_password} onChangeText={(value) => setUserAccount(prev => ({...prev, confirm_password: value}))} placeholderTextColor={Colors.muted} placeholder="Konfirmasi Password" autoCapitalize="none" secureTextEntry={isConfirmSecured}/>
+        <TextInput style={styles.textInput} value={userAccount.confirm_password} onChangeText={(value) => setUserAccount(prev => ({...prev, confirm_password: value}))} placeholderTextColor={Colors.muted} placeholder="Konfirmasi Password" autoCapitalize="none" secureTextEntry={isConfirmSecured}/>
         <TouchableOpacity onPress={() => setIsConfirmSecured(!isConfirmSecured)}>
           <Ionicons name={isConfirmSecured ? "eye-outline" : "eye-off-outline"} size={24} color={Colors.muted} style={styles.icon}/>
         </TouchableOpacity>
@@ -193,6 +193,13 @@ const styles = StyleSheet.create({
         elevation: 2,
       },
     }),
+  },
+  textInput: {
+    fontFamily: "os-regular",
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    fontSize: 12,
+    color: Colors.body,
   },
   inputBar: {
     marginHorizontal: 40,

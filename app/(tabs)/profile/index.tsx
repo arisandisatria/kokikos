@@ -1,10 +1,11 @@
 import { Colors } from '@/constants/theme';
 import { UserDetailContext } from '@/context/UserDetailContext';
 import ThemeText from '@/src/components/ui/ThemeText';
+import { supabase } from '@/utils/supabase';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import { useContext, useState } from 'react';
-import { Image, Modal, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Modal, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export default function index() {
   const router = useRouter()
@@ -17,6 +18,30 @@ export default function index() {
 
   const { userDetail, setUserDetail } = context;
 
+  const firstName = userDetail?.name ? userDetail?.name.trim().split(" ")[0] : "User Keren";
+
+  async function handleLogout() {
+    try {
+      setModalVisible(false)
+
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        Alert.alert("Gagal Keluar:", error.message);
+        return;
+      }
+      
+      setUserDetail(null)
+
+      router.replace("/auth/SignIn")
+    } catch (error) {
+      console.error("Terjadi kesalahan:", error)
+      Alert.alert("Gagal!", "Terjadi kesalahan pada server!");
+    } finally {
+      setModalVisible(false)
+    }
+  }
+  
   return (
     <View style={styles.container}>
       <ThemeText type="title" size="lg" style={styles.header}>Profil Anda</ThemeText>
@@ -26,7 +51,7 @@ export default function index() {
       </View>
 
       <View style={styles.profileInfo}>
-        <ThemeText type='subtitle'>{userDetail?.name}</ThemeText>
+        <ThemeText type='subtitle'>{firstName}</ThemeText>
         <ThemeText type='caption' size='xsm'>{userDetail?.email}</ThemeText>
       </View>
 
@@ -70,7 +95,8 @@ export default function index() {
                 <ThemeText size='sm' style={styles.textCancel}>Batal</ThemeText>
               </TouchableOpacity>
 
-              <TouchableOpacity 
+              <TouchableOpacity
+                onPress={handleLogout}
                 style={[styles.btn, styles.btnConfirm]} 
               >
                 <ThemeText size='sm' style={styles.textConfirm}>Keluar</ThemeText>

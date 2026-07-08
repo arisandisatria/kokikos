@@ -40,12 +40,10 @@ export default function RootLayout() {
         return;
       }
 
-      const firstName = profile.name ? profile.name.trim().split(" ")[0] : "User Keren";
-
       if (profile) {
         setUserDetail({
           id: profile.id,
-          name: firstName,
+          name: profile.name,
           email: profile.email,
           phone_number: profile.phone_number || undefined,
         });
