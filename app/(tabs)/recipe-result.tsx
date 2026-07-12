@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/theme";
-import RecipeResultCard from "@/src/components/features/RecipeResultCard";
+import RecipeResultCard from "@/src/components/shared/RecipeResultCard";
 import ThemeText from "@/src/components/ui/ThemeText";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
