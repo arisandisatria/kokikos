@@ -1,10 +1,21 @@
-import { Colors } from "@/constants/theme";
-import { ActivityIndicator, View } from "react-native";
+import { UserDetailContext } from "@/context/UserDetailContext";
+import { Redirect } from "expo-router";
+import { useContext } from "react";
 
 export default function Index() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" }}>
-      <ActivityIndicator size="large" color={Colors.primary} />
-    </View>
-  )
+  const context = useContext(UserDetailContext);
+
+  if (!context) {
+    return null;
+  }
+
+  const { userDetail, setUserDetail } = context;
+
+  if (userDetail)  {
+    return (
+      <Redirect href="/(tabs)/home" />
+    )
+  } else {
+    <Redirect href={"/auth/SignIn"}/>
+  }
 }

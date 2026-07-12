@@ -14,6 +14,7 @@ export default function savedRecipe() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+    const [searchRecipe, setSearchRecipe] = useState("")
   const context = useContext(UserDetailContext);
   
   if (!context) {
@@ -35,7 +36,7 @@ export default function savedRecipe() {
     fetchSavedRecipes(pageLimit, true);
   }, []);
 
-  async function fetchSavedRecipes(limitValue: number, isInitial = false) {
+  async function fetchSavedRecipes(limitValue: number, isInitial = false, queryText = "") {
     if (isInitial) setLoading(true);
     else setLoadingMore(true);
 
@@ -46,7 +47,7 @@ export default function savedRecipe() {
       return;
     }
 
-    try {
+    try {     
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("bookmarked")
@@ -64,22 +65,35 @@ export default function savedRecipe() {
       }
 
       const limitedIds = allBookmarkedIds.slice(0, limitValue);
+      
+      let recipeQuery = supabase
+      .from("recipes")
+      .select("*", { count: "exact" })
+      .in("id", limitedIds);
 
-      const { data: recipeData, error: recipeError } = await supabase
-        .from("recipes")
-        .select("*")
-        .in("id", limitedIds);
+      if (queryText.trim().length > 3) {
+        recipeQuery = recipeQuery.ilike("recipe_name", `%${queryText.trim()}%`);
+      }
+
+      const { data: recipeData, error: recipeError, count } = await recipeQuery
+        .range(0, limitValue - 1);
 
       if (recipeError) throw recipeError;
 
       if (recipeData) {
-        const sortedRecipes = limitedIds
-          .map(id => recipeData.find(recipe => recipe.id === id))
-          .filter(Boolean);
+       if (queryText.trim().length <= 3) {
+          const sortedRecipes = allBookmarkedIds
+            .slice(0, limitValue)
+            .map(id => recipeData.find(recipe => recipe.id === id))
+            .filter(Boolean);
+            
+          setRecipes(sortedRecipes);
+        } else {
+          setRecipes(recipeData);
+        }
 
-        setRecipes(sortedRecipes);
-
-        if (limitedIds.length >= allBookmarkedIds.length) {
+        const totalMatched = count || 0;
+        if (recipeData.length >= totalMatched) {
           setHasMore(false);
         } else {
           setHasMore(true);
@@ -92,6 +106,7 @@ export default function savedRecipe() {
       setLoadingMore(false);
     }
   }
+
   function handleLoadMore() {
     if (loadingMore || !hasMore) return;
     
@@ -100,6 +115,10 @@ export default function savedRecipe() {
     fetchSavedRecipes(nextLimit, false);
   }
 
+  function handleSearchRecipe() {
+    setCurrentLimit(pageLimit);
+    fetchSavedRecipes(pageLimit, true, searchRecipe);
+  }
   
   const getFilteredRecipes = () => {
     const recipesCopy = [...recipes];
@@ -134,6 +153,9 @@ export default function savedRecipe() {
           placeholder="Cari resep disini..."
           editable={ true}
           selectTextOnFocus={true}
+          value={searchRecipe}
+          onChangeText={setSearchRecipe}
+          onSubmitEditing={handleSearchRecipe}
         />
         <TouchableOpacity>
           <Ionicons name="search" size={32} color={Colors.secondary} />

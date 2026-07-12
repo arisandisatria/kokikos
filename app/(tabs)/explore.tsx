@@ -5,7 +5,7 @@ import { supabase } from "@/utils/supabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, StatusBar, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, ScrollView, StatusBar, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function Explore() {
   const router = useRouter()
@@ -13,6 +13,7 @@ export default function Explore() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [searchRecipe, setSearchRecipe] = useState("")
   
   const pageLimit = 8; 
   const [currentLimit, setCurrentLimit] = useState(pageLimit);
@@ -24,31 +25,33 @@ export default function Explore() {
   ];
 
   useEffect(() => {
-    fetchRecipes(pageLimit, true);
-  }, []);
+    setCurrentLimit(pageLimit);
+    fetchRecipes(pageLimit, true, searchRecipe);
+  }, [selectedFilter]);
 
-  async function fetchRecipes(limitValue: number, isInitial = false) {
+  async function fetchRecipes(limitValue: number, isInitial = false, queryText = "") {
     if (isInitial) setLoading(true);
     else setLoadingMore(true);
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("recipes")
         .select("*")
-        .range(0, limitValue - 1);
+      
+      if (queryText.trim().length > 3) {
+        query = query.ilike("recipe_name", `%${queryText.trim()}%`)
+      }
+
+      const {data, error} = await query.range(0, limitValue -1)
 
       if (error) throw error;
 
       if (data) {
         setRecipes(data);
-
-        if (data.length < limitValue) {
-          setHasMore(false);
-        } else {
-          setHasMore(true);
-        }
+        setHasMore(data.length === limitValue);
       }
     } catch (error) {
+      Alert.alert("Gagal!", "Gagal mengambil data resep!");
       console.error("Gagal mengambil resep:", error);
     } finally {
       setLoading(false);
@@ -62,6 +65,11 @@ export default function Explore() {
     const nextLimit = currentLimit + pageLimit;
     setCurrentLimit(nextLimit);
     fetchRecipes(nextLimit, false);
+  }
+
+  function handleSearchRecipe() {
+    setCurrentLimit(pageLimit);
+    fetchRecipes(pageLimit, true, searchRecipe);
   }
 
   const getFilteredRecipes = () => {
@@ -90,8 +98,11 @@ export default function Explore() {
           placeholder="Cari resep disini..."
           editable={ true}
           selectTextOnFocus={true}
+          value={searchRecipe}
+          onChangeText={setSearchRecipe}
+          onSubmitEditing={handleSearchRecipe}
         />
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleSearchRecipe}>
           <Ionicons name="search" size={32} color={Colors.secondary} />
         </TouchableOpacity>
       </View>

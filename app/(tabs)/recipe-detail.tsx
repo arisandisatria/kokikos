@@ -151,7 +151,7 @@ export default function index() {
         }
       }
 
-      const {error: updateError} = await supabase.from("profiles").update({updatedBookmarks}).eq("id", session.user.id)
+      const {error: updateError} = await supabase.from("profiles").update({ bookmarked: updatedBookmarks }).eq("id", session.user.id)
 
       if (updateError) {
         console.error("Gagal update data:", updateError);
