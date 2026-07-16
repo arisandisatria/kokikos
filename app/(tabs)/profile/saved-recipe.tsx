@@ -207,7 +207,7 @@ export default function savedRecipe() {
                   ingredient_match={recipe.ingredient_match}
                   ingredient_shortage={recipe.ingredient_shortage}
                   onPress={() => router.push({
-                    pathname: "/recipe-detail",
+                    pathname: "/(tabs)/profile/recipe-detail",
                     params: { recipeDetailParams: JSON.stringify(recipe) }
                   })}
                 />

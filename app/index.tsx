@@ -13,7 +13,7 @@ export default function Index() {
 
   if (userDetail)  {
     return (
-      <Redirect href="/(tabs)/home" />
+      <Redirect href="/home" />
     )
   } else {
     <Redirect href={"/auth/SignIn"}/>

@@ -57,13 +57,13 @@ export default function index() {
 
       <View style={styles.itemContainer}>
         <View style={styles.innerItem}>
-          <TouchableOpacity onPress={() => router.push("/(tabs)/profile/edit-profile")}>
+          <TouchableOpacity onPress={() => router.push("/profile/edit-profile")}>
             <Ionicons name="pencil-outline" size={32} color={Colors.primary} style={styles.itemIcon}/>
           </TouchableOpacity>
           <ThemeText style={{marginTop: 4, textAlign: "center"}} size='sm'>Edit Profile</ThemeText>
         </View>
         <View style={styles.innerItem}>
-          <TouchableOpacity onPress={() => router.push("/(tabs)/profile/saved-recipe")}>
+          <TouchableOpacity onPress={() => router.push("/profile/saved-recipe")}>
             <Ionicons name="bookmark-outline" size={32} color={Colors.primary} style={styles.itemIcon}/>
           </TouchableOpacity>
           <ThemeText style={{marginTop: 4, textAlign: "center"}} size='sm'>Resep Tersimpan</ThemeText>

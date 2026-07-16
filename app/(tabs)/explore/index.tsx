@@ -152,8 +152,8 @@ export default function Explore() {
                   ingredient_match={recipe.ingredient_match}
                   ingredient_shortage={recipe.ingredient_shortage}
                   onPress={() => router.push({
-                    pathname: "/recipe-detail",
-                    params: { recipeDetailParams: JSON.stringify(recipe) }
+                    pathname: "/(tabs)/explore/recipe-detail",
+                    params: { recipeDetailParams: JSON.stringify(recipe), fromPage: "explore" }
                   })}
                 />
               </View>

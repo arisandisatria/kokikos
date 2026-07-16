@@ -14,6 +14,7 @@ export default function index() {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState("bahan-alat");
   const [isBookmarked, setIsBookmarked] = useState(false)
+  const { fromPage } = useLocalSearchParams();
 
   const tabs = [
     {
@@ -29,41 +30,6 @@ export default function index() {
       label: "Nutrisi",
     },
   ];
-  const mockIngredients = [{name: "Telur", quantity: "1 butir"}, {name: "Ikan", quantity: "2 ekor"}, {name: "Nasi", quantity: "1 bakul"}, {name: "Bawang Putih", quantity: "1 siung"}, {name: "Jahe", quantity: "1 buah"}]
-  const mockTools = ["Wajan", "Spatula", "Sendok", "Piring", "Pisau"]
-  const mockSteps = ["Panaskan wajan", "Siram wajan", "Buang wajan", 'Beli di depan']
-  const mockNutrition= [
-    {
-      type: "Kalori",
-      weight: "130 kkal",
-      percentage: "15%"
-    },
-    {
-      type: "Karbo",
-      weight: "20 gram",
-      percentage: "80%"
-    },
-    {
-      type: "Protein",
-      weight: "7 gram",
-      percentage: "5%"
-    },
-    {
-      type: "Kalori",
-      weight: "130 kkal",
-      percentage: "15%"
-    },
-    {
-      type: "Karbo",
-      weight: "20 gram",
-      percentage: "80%"
-    },
-    {
-      type: "Karbo",
-      weight: "20 gram",
-      percentage: "80%"
-    },
-  ]
 
   const {recipeDetailParams} = useLocalSearchParams()
 
@@ -92,34 +58,27 @@ export default function index() {
   async function checkIfRecipeBookmarked() {
     if (!id) return;
 
-    const previousBookmarkState = isBookmarked;
+    try { 
+      const { data: { session } } = await supabase.auth.getSession();
 
-    setIsBookmarked(!isBookmarked);
+      if (!session?.user?.id) return;
 
-    try {
-      
+      const {data, error: isError} = await supabase.from("profiles").select("bookmarked").eq("id", session.user.id).single()
+
+      if (isError) {
+        console.error("Gagal mengambil data bookmark:", isError);
+        return;
+      }
+
+      const bookmarkedArray: string[] = data?.bookmarked || []
+
+      const isExist = bookmarkedArray.includes(id)
+
+      setIsBookmarked(isExist)
     } catch (error) {
       console.error("Terjadi kesalahan jaringan/database:", error);
-      setIsBookmarked(previousBookmarkState);
       Alert.alert("Koneksi Gagal", "Gagal menyimpan resep, coba lagi nanti.");
     }
-
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (!session?.user?.id) return;
-
-    const {data, error: isError} = await supabase.from("profiles").select("bookmarked").eq("id", session.user.id).single()
-
-    if (isError) {
-      console.error("Gagal mengambil data bookmark:", isError);
-      return;
-    }
-
-    const bookmarkedArray: string[] = data?.bookmarked || []
-
-    const isExist = bookmarkedArray.includes(id)
-
-    setIsBookmarked(isExist)
   }
 
   async function handleToogleBookmarkRecipe() {
@@ -165,23 +124,23 @@ export default function index() {
   }
 
   useEffect(() => {
-      const handleBackPress = () => {
+    const handleBackButton = () => {
+      if (router.canGoBack()) {
         router.back();
         return true;
-      };
-  
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        handleBackPress,
-      );
+      }
+      return false;
+    };
 
-      checkIfRecipeBookmarked()
-  
-      return () => {
-        backHandler.remove();
-      }; 
-  
-    }, [id]);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackButton
+    );
+
+    checkIfRecipeBookmarked()
+
+    return () => backHandler.remove();
+  }, [router, fromPage, id]);
 
   let content;
 
@@ -258,8 +217,9 @@ export default function index() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
+         <TouchableOpacity
+          onPress={() => router.back()
+          }
         >
           <Ionicons name="arrow-back" size={32} color="black" />
         </TouchableOpacity>
@@ -270,7 +230,7 @@ export default function index() {
       </View>
 
         <View style={styles.imageContainer}>
-          <Image source={require("../../assets/images/placeholder.png")} />
+          <Image source={require("../../../assets/images/placeholder.png")} />
           <ThemeText type="title" size="lg" style={{ marginTop: 32 }}>
             {recipe_name}
           </ThemeText>

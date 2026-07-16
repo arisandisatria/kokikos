@@ -108,6 +108,10 @@ export default function RecipeResult() {
         })}
       </View>
 
+      <View>
+
+      </View>
+
       <ScrollView 
         style={{ flex: 1, marginTop: 12 }} 
         showsVerticalScrollIndicator={false}
@@ -122,7 +126,7 @@ export default function RecipeResult() {
               ingredient_match={recipe.ingredient_match}
               ingredient_shortage={recipe.ingredient_shortage}
               onPress={() => router.push({
-                pathname: "/recipe-detail",
+                pathname: "/(tabs)/home/recipe-detail",
                 params: { recipeDetailParams: JSON.stringify(recipe) }
               })}
             />
@@ -138,6 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 16,
     marginTop: StatusBar.currentHeight || 40,
+    marginBottom: 60
   },
   header: {
     position: "relative",

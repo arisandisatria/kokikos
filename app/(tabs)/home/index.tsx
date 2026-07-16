@@ -6,7 +6,6 @@ import ThemeText from "@/src/components/ui/ThemeText";
 import { Ingredient } from "@/src/types";
 import { supabase } from "@/utils/supabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { NavigationBar } from "expo-navigation-bar";
 import { useRouter } from "expo-router";
 import { useContext, useState } from "react";
 import {
@@ -94,7 +93,7 @@ export default function Home() {
       if (existingRecipe && existingRecipe.length > 0) {
         setLoading(false)
         router.push({
-            pathname: "/recipe-result",
+            pathname: "/(tabs)/home/recipe-result",
             params: {
               recipesParams: JSON.stringify(existingRecipe),
             },
@@ -102,7 +101,11 @@ export default function Home() {
         return
       }
 
-      const userPrompt =`Berikut adalah bahan yang dimiliki pengguna: ${ingredientList + prompt.RECIPE}`
+      const formattedIngredients = ingredientList
+        .map((item) => `${item.name} ${item.quantity ? `(${item.quantity})` : ""}`)
+        .join(", ");
+
+      const userPrompt =`Berikut adalah bahan yang dimiliki pengguna: ${formattedIngredients + prompt.RECIPE}`
       
       const result = await askGemini(userPrompt)
 
@@ -164,7 +167,7 @@ export default function Home() {
       setIngredient("")
       setIngredientsList([])
       router.push({
-        pathname: "/recipe-result",
+        pathname: "/(tabs)/home/recipe-result",
         params: {
           recipesParams: JSON.stringify(insertedData), 
         },
@@ -183,105 +186,116 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <NavigationBar hidden />
       <View style={styles.header}>
         <ThemeText type="title" size="lg">
           Halo,{" "}
-          <ThemeText type="title" size="lg" style={{color: Colors.primary}}>
+          <ThemeText type="title" size="lg" style={{ color: Colors.primary }}>
             {firstName}
           </ThemeText>
           !
         </ThemeText>
-        <TouchableOpacity onPress={() => router.push("/profile")} activeOpacity={0.8} style={styles.imageContainer}>
-          <Image source={require("../../assets/images/avatar.png")} style={styles.avatar} resizeMode='cover'/>
+        <TouchableOpacity 
+          onPress={() => router.push("/profile")} 
+          activeOpacity={0.7} 
+          style={styles.imageContainer}
+        >
+          <Image 
+            source={require("../../../assets/images/avatar.png")} 
+            style={styles.avatar} 
+            resizeMode='cover'
+          />
         </TouchableOpacity>
       </View>
 
-      <View style={{marginTop: 48,}}>
-        <ThemeText type="title" style={{ textAlign: "center",}}>
+      <View style={{ marginTop: 48 }}>
+        <ThemeText type="title" style={{ textAlign: "center", marginBottom: 4 }}>
           Lagi laper? Ada bahan apa nih?
         </ThemeText>
 
         <View style={[styles.card, styles.inputBar]}>
           <TextInput
-            style={[
-                    styles.textInput,
-                    ingredient === '' ? styles.textInput : styles.textInput
-                  ]}
+            style={styles.textInput}
             placeholderTextColor={Colors.muted}
             placeholder="Isi bahan satu per satu disini..."
             value={ingredient}
-            editable={loading ? false : true}
-            selectTextOnFocus={loading ? false : true}
+            editable={!loading}
+            selectTextOnFocus={!loading}
             onChangeText={setIngredient}
             onSubmitEditing={handleAddIngredient}
           />
-          <TouchableOpacity onPress={handleAddIngredient}>
+          <TouchableOpacity 
+            onPress={handleAddIngredient}
+            activeOpacity={0.6}
+          >
             <Ionicons name="add-circle" size={32} color={Colors.secondary} />
           </TouchableOpacity>
         </View>
 
         <View style={[styles.card, styles.listContainer]}>
-          <ThemeText size="sm" type="title">
+          <ThemeText size="sm" type="title" style={{ color: Colors.body, opacity: 0.9 }}>
             Bahan-bahanmu:
           </ThemeText>
 
           {ingredientList.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="basket-outline" size={40} color={Colors.muted} />
-              <ThemeText size="sm" type="caption" style={{ textAlign: "center",}}>
+              <Ionicons name="basket-outline" size={44} color={Colors.muted} style={{ marginBottom: 6 }} />
+              <ThemeText size="sm" type="caption" style={{ textAlign: "center", color: Colors.muted }}>
                 Bahan belum dimasukkan
               </ThemeText>
             </View>
           ) : (
             <ScrollView 
-                    style={{flex: 1, marginTop: 10}} 
-                    showsVerticalScrollIndicator={false}
-                  >
-            {ingredientList.map((item) => (
-              <View key={item.id} style={styles.ingredientRow}>
-                <ThemeText size="sm" style={styles.ingredientName}>
-                  {item.name}
-                </ThemeText>
-                <TextInput
-                  style={styles.quantityInput}
-                  placeholderTextColor={Colors.muted}
-                  placeholder="Isi jumlah bahan"
-                  value={item.quantity}
-                  editable={loading ? false : true}
-                  selectTextOnFocus={loading ? false : true}
-                  onChangeText={(text) =>
-                    handleUpdateIngredientQuantity(text, item.id)
-                  }
-                />
-                <TouchableOpacity
-                  disabled={loading}
-                  onPress={() => handleRemoveIngredient(item.id)}
-                >
-                  <Ionicons
-                    name="close-sharp"
-                    size={28}
-                    color={Colors.danger}
+              style={{ flex: 1, marginTop: 12 }} 
+              showsVerticalScrollIndicator={false}
+            >
+              {ingredientList.map((item) => (
+                <View key={item.id} style={styles.ingredientRow}>
+                  <ThemeText size="sm" style={styles.ingredientName}>
+                    {item.name}
+                  </ThemeText>
+                  
+                  <TextInput
+                    style={styles.quantityInput}
+                    placeholderTextColor={Colors.muted}
+                    placeholder="Contoh: 2 butir, 50gr"
+                    value={item.quantity}
+                    editable={!loading}
+                    selectTextOnFocus={!loading}
+                    onChangeText={(text) => handleUpdateIngredientQuantity(text, item.id)}
                   />
-                </TouchableOpacity>
-              </View>
-            ))}</ScrollView>
+                  
+                  <TouchableOpacity
+                    disabled={loading}
+                    activeOpacity={0.6}
+                    onPress={() => handleRemoveIngredient(item.id)}
+                    style={{ padding: 4 }}
+                  >
+                    <Ionicons
+                      name="close-sharp"
+                      size={22}
+                      color={Colors.danger}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
           )}
         </View>
 
         {ingredientList.length > 0 && (
           <TouchableOpacity
-            style={[styles.buttonSubmit, {
-                  backgroundColor: !loading ? Colors.primary : Colors.muted,
-            }]}
+            style={[
+              styles.buttonSubmit, 
+              { backgroundColor: !loading ? Colors.primary : Colors.muted }
+            ]}
             onPress={handleSearchRecipe}
             disabled={loading}
+            activeOpacity={0.8}
           >
             {loading && (
-              <ActivityIndicator size="small" color="#fff" style={{ marginRight: 8,}} />
+              <ActivityIndicator size="small" color="#fff" style={{ marginRight: 10 }} />
             )}
-            
-            <ThemeText size="base" type="title" style={{ color: "#FFFFFF",}}>
+            <ThemeText size="base" type="title" style={{ color: "#FFFFFF" }}>
               {loading ? "Mencari Resep..." : "Cari Resep"}
             </ThemeText>
           </TouchableOpacity>
@@ -301,27 +315,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginTop: 8,
   },
   imageContainer: {
-    width: 50,
-    height: 50,
-    alignItems: "center",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     overflow: "hidden",
-    borderRadius: 75
-  },
-  avatar: {
-  borderRadius: 75,
-  ...Platform.select({
+    backgroundColor: "#E2E8F0",
+    ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 7 },
-        shadowOpacity: 0.05,
-        shadowRadius: 7,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
       },
       android: {
-        elevation: 5,
+        elevation: 3,
       },
     }),
+  },
+  avatar: {
+    width: "100%",
+    height: "100%",
   },
   card: {
     backgroundColor: "#FFFFFF",
@@ -329,9 +345,9 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 7 },
-        shadowOpacity: 0.05,
-        shadowRadius: 7,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
       },
       android: {
         elevation: 2,
@@ -339,12 +355,14 @@ const styles = StyleSheet.create({
     }),
   },
   inputBar: {
-    marginHorizontal: 40,
-    marginTop: 28,
-    height: 56,
+    marginHorizontal: 20,
+    marginTop: 20,
+    height: 54,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
   },
   textInput: {
     fontFamily: "os-regular",
@@ -355,42 +373,61 @@ const styles = StyleSheet.create({
     color: Colors.body,
   },
   listContainer: {
-    minHeight: "50%",
-    marginHorizontal: 40,
+    minHeight: "45%",
+    marginHorizontal: 20,
     marginTop: 16,
     padding: 16,
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
   },
   emptyContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    opacity: 0.7,
   },
   ingredientRow: {
-    marginTop: 6,
+    paddingVertical: 8,
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+    gap: 8,
   },
   ingredientName: {
     flex: 1,
     color: Colors.body,
+    fontFamily: "os-semibold",
   },
   quantityInput: {
-    width: "45%",
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.body,
-    paddingVertical: 0,
-    fontSize: 10,
+    width: "60%",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    fontSize: 12,
     color: Colors.body,
-    fontFamily: "os-regular"
+    fontFamily: "os-regular",
+    textAlign: "left",
   },
   buttonSubmit: {
-    marginHorizontal: 40,
-    marginTop: 20,
+    marginHorizontal: 20,
+    marginTop: 24,
     borderRadius: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    ...Platform.select({
+      ios: {
+        shadowColor: Colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
 });

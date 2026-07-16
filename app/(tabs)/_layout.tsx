@@ -21,12 +21,12 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: "#fff",
           borderTopWidth: 0,
-          height: 60 + insets.bottom,
-          elevation: 2,
-          paddingBottom: insets.bottom + (Platform.OS === "android" ? 10 : 0),
-          paddingTop: 10,
-          borderTopRightRadius: 16,
-          borderTopLeftRadius: 16,
+          height: Platform.OS === "ios" ? 64 : 60 + (insets.bottom > 0 ? insets.bottom - 10 : 0),
+          elevation: 4,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : (Platform.OS === "android" ? 4 : 0),
+          paddingTop: Platform.OS === "ios" ? 12 : 0,
+          borderTopRightRadius: 32,
+          borderTopLeftRadius: 32,
           position: "absolute",
         },
       }}
@@ -75,18 +75,6 @@ export default function TabLayout() {
               />
             </View>
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="recipe-result"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="recipe-detail"
-        options={{
-          href: null,
         }}
       />
     </Tabs>

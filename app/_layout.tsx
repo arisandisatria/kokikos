@@ -8,6 +8,7 @@ import {
   OpenSans_700Bold,
   useFonts,
 } from "@expo-google-fonts/open-sans";
+import { NavigationBar } from 'expo-navigation-bar';
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
@@ -100,19 +101,18 @@ export default function RootLayout() {
         style={{ flex: 1, backgroundColor: "#0f172a" }}
         edges={["bottom"]}
       >
+      <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
+        <Stack screenOptions={{ headerShown: false }} />
+        <NavigationBar hidden />
 
-        <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-         <Stack screenOptions={{ headerShown: false }} />
-
-          {(!isAuthReady || !fontsLoaded) && (
-            <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color={Colors.primary} />
-            </View>
-          )}
-        </UserDetailContext.Provider>
+        {(!isAuthReady || !fontsLoaded) && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+          </View>
+        )}
+      </UserDetailContext.Provider>
       </SafeAreaView>
     </SafeAreaProvider>
-
   );
 }
 

@@ -27,7 +27,7 @@ function RecipeResultCard({
           height: isInResultPage ? "100%" : "50%",
           borderBottomLeftRadius: isInResultPage ? 24 : 0,
           borderTopLeftRadius: isInResultPage ? 24 : 0,
-          marginTop: 8
+          marginTop:  isInResultPage ? 0 : 8
         }}
         resizeMode="cover"
       />
@@ -35,8 +35,9 @@ function RecipeResultCard({
       <View style={[styles.contentContainer, {
         width: isInResultPage ? "65%" : '100%',
         paddingLeft: isInResultPage ? 8 : 0,
+            alignItems: isInResultPage ? "flex-start" : "center"
       }]} >
-        <ThemeText type="subtitle" size="sm" style={{width: isInResultPage ? "75%" : "100%", textAlign: "center"}}>{recipe_name}</ThemeText>
+        <ThemeText type="subtitle" size="sm" style={{width: isInResultPage ? "75%" : "100%", textAlign: !isInResultPage ? "center" : "left"}}>{recipe_name}</ThemeText>
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingVertical: 8,
-    alignItems: "center",
+
   },
   infoRow: {
     marginTop: 6,
