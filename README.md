@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <img src="./assets/images/avatar.png" alt="KokiKos Logo" width="120" height="120" style="border-radius: 60px;" />
+  <img src="./assets/images/logo.png" alt="KokiKos Logo" width="120" height="120" style="border-radius: 60px;" />
 </p>
 
 <p align="center">
@@ -56,7 +56,7 @@ Aplikasi ini dibangun menggunakan ekosistem teknologi modern:
 * **Navigation:** [Expo Router](https://docs.expo.dev/router/introduction/)
 * **Language:** TypeScript
 * **Database & Authentication:** [Supabase](https://supabase.com/)
-* **State Management:** React Context API (`UserDetailContext`)
+* **State Management:** React Context API
 * **Styling:** React Native StyleSheet
 * **AI Engine:** Google Gemini API
 
