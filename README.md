@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <img src="./assets/images/logo.png" alt="KokiKos Logo" width="120" height="120" style="border-radius: 60px;" />
+  <img src="./assets/logo.png" alt="KokiKos Logo" width="120" height="120" style="border-radius: 60px;" />
 </p>
 
 <p align="center">
